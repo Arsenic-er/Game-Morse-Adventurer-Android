@@ -1,5 +1,6 @@
 // Browser smoke test. Run on the development server; start preview on port 4176.
-// Set CWGAME_QA_CHAPTER_TWO=1 to continue from the real Chapter One unlock through Chapter Two.
+// Set CWGAME_QA_CHAPTER_TWO=1 to continue through Chapter Two.
+// CWGAME_QA_CHAPTER_THREE=1 includes both prerequisites and continues through Chapter Three.
 // Uses the existing qaCapture switch to expose the selected blind-listening callsign
 // and skip audio playback; CW still passes through key events, AutomaticKeyer,
 // decoding, protocol validation and the normal save/mission settlement paths.
@@ -230,7 +231,7 @@ try {
   assert.equal((await saved()).money,claimed.money);
 
   let chapterTwoEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_TWO === '1') {
+  if (process.env.CWGAME_QA_CHAPTER_TWO === '1' || process.env.CWGAME_QA_CHAPTER_THREE === '1') {
     await click('[data-action="enter-chapter-two-home"]');
     await until('document.querySelector(\'[data-story-chapter="2"][data-story-beat="paper"]\')');
     assert.equal((await saved()).missionState.activeMissions.find(m => m.id === 'story-02')?.id,'story-02');
@@ -347,6 +348,123 @@ try {
     assert.equal((await saved()).technologyPoints,afterClaim.technologyPoints);
     chapterTwoEvidence={passed:true,actual:{id:actualTwo.id,callsign:actualTwo.callsign,sent:actualTwo.sent,received:actualTwo.received},successfulAgn:true,missionMoneyReward:220,achievementMoneyReward:100,newAchievements,moneyBeforeClaim:beforeClaim.money,moneyAfterClaim:afterClaim.money,technologyPointsBeforeClaim:beforeClaim.technologyPoints,technologyPointsAfterClaim:afterClaim.technologyPoints,openingReload:true,endingReload:true,settingsPause:true,mobileLayout:true,chapterThreeUnlocked:true,duplicateReward:false};
   }
+
+  let chapterThreeEvidence = null;
+  if (process.env.CWGAME_QA_CHAPTER_THREE === '1') {
+    await click('[data-action="enter-chapter-three-home"]');
+    await until('document.querySelector(\'[data-story-chapter="3"][data-story-beat="listen"]\')');
+    const baseline = await saved();
+    assert.equal(baseline.missionState.activeMissions.find(m=>m.id==='story-03')?.id,'story-03');
+    await screenshot('20-chapter-three-listen');
+    await finishScene('chapter-three-primary');
+    await until('document.querySelector(\'[data-story-beat="notes"]\')');
+    await call('Page.reload');await click('.menu-primary');await click('.save-primary-action');await click('[data-action="enter-chapter-three-home"]');
+    await until('document.querySelector(\'[data-story-beat="notes"]\')');
+    await finishScene('chapter-three-primary');
+    await until('document.querySelector(\'[data-story-chapter="3"][data-story-beat="call"]\')');
+    await screenshot('21-chapter-three-call');
+    assert.equal(await evaluate('document.querySelector(".chapter-three-story-screen").dataset.storyContactCount'),'0');
+    await click('.chapter-one-review-settings');
+    await until('document.querySelector(".settings-modal")');
+    assert.equal(await evaluate('document.querySelector(".chapter-three-story-screen").inert'),true);
+    await click('.settings-modal header .icon-button');
+    await until('!document.querySelector(".chapter-three-story-screen").inert');
+    await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await evaluate('window.scrollTo(0,0)');
+    await screenshot('21a-chapter-three-mobile');
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+    await evaluate('document.querySelector(\'[data-action="chapter-three-primary"]\').scrollIntoView({block:"center"})');
+    assert(await evaluate('(()=>{const r=document.querySelector(\'[data-action="chapter-three-primary"]\').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight})()'));
+    await call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    await evaluate('window.scrollTo(0,0)');
+    const actualContacts = [];
+    const byStyle = new Map();
+    for(let attempt=0; attempt<15 && byStyle.size<3; attempt++){
+      await finishScene('chapter-three-primary');
+      await until('document.querySelector(".station-screen")?.dataset.qsoPhase==="PLAYER_CQ"');
+      let finished = false;
+      for(let turn=0;turn<24;turn++){
+        const current = await phase();console.log('CHAPTER THREE',attempt,'PHASE',current);
+        if(current==='QSO_COMPLETE'){finished=true;break;}
+        if(current==='QSO_FAILED'){
+          await screenshot('chapter-three-retry-'+attempt+'-'+turn);
+          await click('.qso-result-modal.failed .qso-result-primary');continue;
+        }
+        if(['PLAYER_CQ','PLAYER_RST_AND_73','PLAYER_OPTIONAL_ANSWER'].includes(current)){
+          if(await evaluate('!!document.querySelector(\'[data-action="clear-and-retry"]\')'))await click('[data-action="clear-and-retry"]');
+          const remote=await evaluate('document.querySelector(".station-screen").dataset.qaNpcCallsign');
+          const template=await evaluate('document.querySelector(\'[data-testid="qso-duty-template"]\')?.textContent');
+          const text=current==='PLAYER_OPTIONAL_ANSWER'?'SKIP K':template?.replace('REMOTE',remote);
+          assert(text);await sendText(text);await pause(900);
+        }
+        await until('["PLAYER_CQ","PLAYER_RST_AND_73","PLAYER_OPTIONAL_ANSWER","QSO_COMPLETE","QSO_FAILED"].includes(document.querySelector(".station-screen")?.dataset.qsoPhase)',65000);
+      }
+      assert(finished,'third chapter contact completed through keyboard events');
+      assert.equal((await saved()).qsoLogs.length,baseline.qsoLogs.length+actualContacts.length);
+      assert.equal(await evaluate('!!document.querySelector(\'[data-action="continue-chapter-three"]\')'),false);
+      await click('.qso-result-modal.success .qso-result-primary');
+      await until('document.querySelector(\'[data-action="continue-chapter-three"]\')');
+      const after = await saved();
+      const entry = after.qsoLogs.find(log=>!baseline.qsoLogs.some(old=>old.id===log.id)&&!actualContacts.some(old=>old.id===log.id));
+      assert(entry);
+      assert(after.qsoRecords.settledQsoIds.includes(entry.id));
+      assert(after.missionState.events.some(event=>event.qsoId===entry.id&&event.outcome==='progress'&&event.missionIds.includes('story-03')));
+      actualContacts.push(entry);
+      if(!byStyle.has(entry.operatorProfileId))byStyle.set(entry.operatorProfileId,entry);
+      console.log('CHAPTER THREE CONTACT',JSON.stringify({id:entry.id,callsign:entry.callsign,style:entry.operatorProfileId,unique:byStyle.size}));
+      assert.equal(await evaluate('!!document.querySelector(\'[data-action="continue-chapter-two"]\')'),false);
+      await click('[data-action="continue-chapter-three"]');
+      await until('document.querySelector(\'[data-story-chapter="3"][data-story-contact-count="'+byStyle.size+'"]\')');
+      const beat=await evaluate('document.querySelector(".chapter-three-story-screen").dataset.storyBeat');
+      assert.equal(beat,byStyle.size===3?'compare':'call');
+      if(byStyle.size<3){
+        await click('[data-action="vn-notes"]');
+        assert.equal(await evaluate('document.querySelectorAll(\'[data-testid="chapter-three-real-logs"] [data-qso-id]\').length'),byStyle.size);
+        await screenshot('22-chapter-three-partial-'+actualContacts.length);
+        await click('.vn-modal header button');
+        await call('Page.reload');await click('.menu-primary');await click('.save-primary-action');await click('[data-action="enter-chapter-three-home"]');
+        await until('document.querySelector(\'[data-story-chapter="3"][data-story-contact-count="'+byStyle.size+'"][data-story-beat="call"]\')');
+        assert.equal((await saved()).money,after.money);
+      }
+    }
+    assert.equal(byStyle.size,3,'three actual styles found without injecting a responder or success state');
+    await screenshot('23-chapter-three-compare');
+    await finishScene('chapter-three-primary');
+    await until('document.querySelector(\'[data-story-chapter="3"][data-story-beat="log"]\')');
+    await click('[data-action="vn-notes"]');
+    assert.equal(await evaluate('document.querySelectorAll(\'[data-testid="chapter-three-real-logs"] [data-qso-id]\').length'),3);
+    const recordText=await evaluate('document.querySelector(\'[data-testid="chapter-three-real-logs"]\').innerText');
+    for(const entry of byStyle.values()){
+      assert(recordText.includes(entry.callsign));
+      assert(recordText.includes(entry.sent+' / '+entry.received));
+    }
+    await screenshot('24-chapter-three-logs');
+    await click('.vn-modal header button');
+    const beforeClaim=await saved();
+    await call('Page.reload');await click('.menu-primary');await click('.save-primary-action');await click('[data-action="enter-chapter-three-home"]');
+    await until('document.querySelector(\'[data-story-chapter="3"][data-story-beat="log"]\')');
+    assert.equal((await saved()).money,beforeClaim.money);
+    await finishScene('chapter-three-primary');
+    await until('document.querySelector(\'[data-story-chapter="3"][data-story-status="claimed"]\')');
+    const afterClaim=await saved();
+    assert.equal(afterClaim.money,beforeClaim.money+300);
+    assert.equal(afterClaim.technologyPoints,beforeClaim.technologyPoints+1);
+    assert.equal(afterClaim.missionState.claimedMissionIds.filter(id=>id==='story-03').length,1);
+    assert.deepEqual(afterClaim.claimedAchievementRewards,beforeClaim.claimedAchievementRewards);
+    await screenshot('25-chapter-three-claimed');
+    await click('[data-action="chapter-three-primary"]');
+    await until('document.querySelector(".home-screen")');
+    assert.equal(await evaluate('!!document.querySelector(\'[data-action="enter-chapter-three-home"]\')'),false);
+    await click('[data-action="open-missions"]');
+    await until('document.querySelector(\'[data-mission-id="story-04"][data-mission-status="available"]\')');
+    await screenshot('26-chapter-four-unlocked');
+    await click('.mission-center-modal header .icon-button');
+    await call('Page.reload');await click('.menu-primary');await click('.save-primary-action');
+    assert.equal((await saved()).money,afterClaim.money);
+    assert.equal((await saved()).technologyPoints,afterClaim.technologyPoints);
+    chapterThreeEvidence={passed:true,actualContacts:actualContacts.map(({id,callsign,operatorProfileId,sent,received})=>({id,callsign,operatorProfileId,sent,received})),uniqueStyles:[...byStyle.keys()],duplicateStylesObserved:actualContacts.length>byStyle.size,openingReload:true,partialReload:true,endingReload:true,settingsPause:true,mobileLayout:true,moneyBeforeClaim:beforeClaim.money,moneyAfterClaim:afterClaim.money,technologyPointsBeforeClaim:beforeClaim.technologyPoints,technologyPointsAfterClaim:afterClaim.technologyPoints,chapterFourUnlocked:true,duplicateReward:false};
+  }
+
   const finalMoney=(await saved()).money;
 
   await call('Page.navigate',{url:new URL('?review=chapter-1',baseUrl).href});
@@ -354,7 +472,7 @@ try {
   assert.equal((await saved()).money,finalMoney);
   await screenshot('10-review-preserved');
   assert.equal(exceptions.length,0,JSON.stringify(exceptions));
-  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,baseUrl,fixtureWpm,recordedAt:new Date().toISOString(),actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,chapterTwo:chapterTwoEvidence,bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
+  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,baseUrl,fixtureWpm,recordedAt:new Date().toISOString(),actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,chapterTwo:chapterTwoEvidence,chapterThree:chapterThreeEvidence,bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
   console.log(JSON.stringify({passed:true,profile,output}));
 }
 catch(error){

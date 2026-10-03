@@ -1,5 +1,6 @@
 import { normalizeChapterOnePresentation } from "./chapterOneStory.js";
 import { normalizeChapterTwoPresentation } from "./chapterTwoStory.js";
+import { normalizeChapterThreePresentation } from "./chapterThreeStory.js";
 import { ANTENNAS } from "./antennaCatalog.js";
 import { ACCESSORIES } from "./accessoryCatalog.js";
 import { KEY_OPTIONS, TRANSMITTERS } from "./equipmentCatalog.js";
@@ -103,6 +104,7 @@ export function createSave({
     missionState: emptyMissionState(),
     chapterOnePresentation: normalizeChapterOnePresentation(null),
     chapterTwoPresentation: normalizeChapterTwoPresentation(null),
+    chapterThreePresentation: normalizeChapterThreePresentation(null),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: emptyWorldCalendarState(),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,
@@ -208,6 +210,7 @@ export function normalizeSave(save) {
     missionState: normalizeMissionState(save?.missionState),
     chapterOnePresentation: normalizeChapterOnePresentation(Object.getOwnPropertyDescriptor(save, "chapterOnePresentation")?.value),
     chapterTwoPresentation: normalizeChapterTwoPresentation(Object.getOwnPropertyDescriptor(save, "chapterTwoPresentation")?.value),
+    chapterThreePresentation: normalizeChapterThreePresentation(Object.getOwnPropertyDescriptor(save, "chapterThreePresentation")?.value),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: normalizeWorldCalendarState(save?.worldCalendarState),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,

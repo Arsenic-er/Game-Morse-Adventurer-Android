@@ -2,7 +2,7 @@ import { touchSaveWorldCalendar } from "./saveStore.js";
 
 export function isWorldCalendarGameplayActive({ activeSaveId, screen, practiceReturnScreen }) {
   if (!activeSaveId) return false;
-  if (screen === "home" || screen === "station" || screen === "lights" || screen === "chapter-one" || screen === "chapter-two") return true;
+  if (screen === "home" || screen === "station" || screen === "lights" || screen === "chapter-one" || screen === "chapter-two" || screen === "chapter-three") return true;
   return screen === "practice" && practiceReturnScreen === "home";
 }
 
