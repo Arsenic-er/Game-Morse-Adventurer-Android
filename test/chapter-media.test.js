@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 import { activeStoryChapter, CHAPTER_MEDIA, chapterForScreen, chapterMedia } from "../src/media/chapterMediaCatalog.js";
 import {
   CHAPTER_SCENE_EFFECTS, chapterSceneEffects, chapterSceneStyle, nextSceneEventDelay,
@@ -12,10 +11,10 @@ import {
   normalizeChapterMediaSettings, persistChapterMediaSettings,
 } from "../src/media/chapterMediaSettings.js";
 
-const root = fileURLToPath(new URL("../", import.meta.url));
+const publicRoot = new URL("../public/", import.meta.url);
 
 function assetBuffer(assetPath) {
-  return readFileSync(`${root}public\\${assetPath.replace("./", "").replaceAll("/", "\\")}`);
+  return readFileSync(new URL(assetPath, publicRoot));
 }
 
 function hash(buffer) {
@@ -49,7 +48,7 @@ test("all fifteen chapters ship a distinct complete five-part media set", () => 
 });
 
 test("the public audit manifest matches every catalogued asset", () => {
-  const manifest = JSON.parse(readFileSync(`${root}public\\assets\\chapters\\manifest.json`, "utf8"));
+  const manifest = JSON.parse(assetBuffer("./assets/chapters/manifest.json").toString("utf8"));
   assert.equal(manifest.schemaVersion, 2);
   assert.equal(manifest.chapters.length, 15);
   for (const media of CHAPTER_MEDIA) {

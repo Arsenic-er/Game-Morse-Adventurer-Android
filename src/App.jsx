@@ -1297,7 +1297,9 @@ function initialScreenFromUrl() {
 }
 
 export function App() {
-  const [localReviewBoot] = useState(() => window.cwgameSystem?.chapterOneLocalReview === true ? bootstrapChapterOneLocalReview() : null);
+  const [localReviewBoot] = useState(() => (
+    typeof window !== "undefined" && window.cwgameSystem?.chapterOneLocalReview === true ? bootstrapChapterOneLocalReview() : null
+  ));
   const [language, setLanguage] = useState(loadLanguagePreference);
   const [keyType, setKeyType] = useState("manual");
   const [automaticKeyWpm, setAutomaticKeyWpm] = useState(DEFAULT_AUTOMATIC_KEY_WPM);

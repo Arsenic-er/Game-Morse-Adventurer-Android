@@ -11,23 +11,31 @@ import assert from 'node:assert/strict';
 import { createSave, SAVE_STORAGE_KEY, ACTIVE_SAVE_KEY } from '../src/game/saveStore.js';
 import { MORSE_CODE } from '../src/cw/morse.js';
 
-const output = path.resolve('qa-artifacts-chapter-one-live');
+const output = path.resolve(process.env.CWGAME_QA_OUTPUT || 'qa-artifacts-chapter-one-live');
 const baseUrl = process.env.CWGAME_QA_URL || 'http://127.0.0.1:4176/';
 const chromePath = process.env.CWGAME_QA_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const fixtureWpm = Number(process.env.CWGAME_QA_WPM || 18);
+assert(Number.isInteger(fixtureWpm) && fixtureWpm >= 5 && fixtureWpm <= 40, 'QA WPM must be an integer from 5 to 40');
 const profile = path.join(os.tmpdir(), `cw-chapter-one-live-${Date.now()}`);
 await mkdir(output, { recursive: true });
 const chrome = spawn(chromePath, [
   '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
   '--disable-background-timer-throttling', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank',
-], { windowsHide: true, stdio: 'ignore' });
+], { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+let launchError;
+let browserStderr = '';
+chrome.on('error', error => { launchError = error; });
+chrome.stderr.on('data', chunk => { browserStderr = (browserStderr + chunk).slice(-8000); });
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 let socket;
 try {
   let port;
   for (let i=0;i<80;i++) {
+    if (launchError) throw launchError;
+    if (chrome.exitCode !== null) throw new Error(`Chrome exited (${chrome.exitCode}): ${browserStderr}`);
     try { port=(await readFile(path.join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];break; } catch { await pause(250); }
   }
-  assert(port);
+  assert(port, `Chrome did not expose DevTools: ${browserStderr}`);
   const tabs=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
   socket=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
   await new Promise(r=>socket.addEventListener('open',r,{once:true}));
@@ -73,34 +81,37 @@ try {
   const sendText=async text=>{
     console.log(`KEYING ${text}`);
     const words=text.trim().toUpperCase().split(/\s+/);
-    const steps=words.flatMap((word,wi)=>[...word].map((char,ci)=>({pattern:MORSE_CODE[char],gap:ci<word.length-1?1200/18*2:wi<words.length-1?1200/18*6:0})));
+    const wpm=await evaluate(`Number(document.querySelector('.station-screen')?.dataset.keyerWpm)`);
+    assert(Number.isFinite(wpm) && wpm >= 5 && wpm <= 40, 'live station keyer speed is available');
+    const steps=words.flatMap((word,wi)=>[...word].map((char,ci)=>({pattern:MORSE_CODE[char],separator:ci<word.length-1?'character':wi<words.length-1?'word':null})));
+    assert(steps.every(step=>step.pattern), 'QA message contains only supported Morse characters');
     await evaluate(`(async()=>{
       const pause=ms=>new Promise(r=>setTimeout(r,ms));
-      for(const {pattern,gap} of ${JSON.stringify(steps)}){
+      const dotMs=1200/${JSON.stringify(wpm)};
+      for(const {pattern,separator} of ${JSON.stringify(steps)}){
           const symbols=pattern;
           const station=()=>document.querySelector('.station-screen');
           const before=Number(station().dataset.pulseCount);
-          const channel=new MessageChannel();const waiters=[];
-          channel.port1.onmessage=()=>waiters.shift()?.();
-          const yieldTask=()=>new Promise(r=>{waiters.push(r);channel.port2.postMessage(null)});
           const waitUntil=predicate=>new Promise((resolve,reject)=>{
             const started=performance.now();const timer=setInterval(()=>{
               if(predicate()){clearInterval(timer);resolve()}
               else if(performance.now()-started>5000){clearInterval(timer);reject(new Error('keyer not idle'))}
             },10);
           });
-          try {
-            for(const symbol of symbols){
-              const key=symbol==='.'?'z':'x';const code='Key'+key.toUpperCase();
-              window.dispatchEvent(new KeyboardEvent('keydown',{key,code,bubbles:true,cancelable:true}));
-              const start=performance.now();while(performance.now()-start<8){}
-              window.dispatchEvent(new KeyboardEvent('keyup',{key,code,bubbles:true,cancelable:true}));
-              await yieldTask();
-            }
-            await waitUntil(()=>Number(station().dataset.pulseCount)>=before+symbols.length);
-            await waitUntil(()=>Boolean(document.querySelector('[data-action="submit-reply"]:not([disabled])')));
-          } finally {channel.port1.close();channel.port2.close()}
-          if(gap>0)await pause(gap);
+          for(const symbol of symbols){
+            const key=symbol==='.'?'z':'x';const code='Key'+key.toUpperCase();
+            window.dispatchEvent(new KeyboardEvent('keydown',{key,code,bubbles:true,cancelable:true}));
+            const start=performance.now();while(performance.now()-start<dotMs*0.12){}
+            window.dispatchEvent(new KeyboardEvent('keyup',{key,code,bubbles:true,cancelable:true}));
+          }
+          await waitUntil(()=>Number(station().dataset.pulseCount)>=before+symbols.length);
+          await waitUntil(()=>Boolean(document.querySelector('[data-action="submit-reply"]:not([disabled])')));
+          if(separator==='character'){
+            // Match the packaged QA helper: timer overshoot must not create a word boundary.
+            const started=performance.now();
+            while(performance.now()-started<dotMs*2){}
+          }
+          if(separator==='word')await pause(dotMs*6);
       }
     })()`);
     const decoded=await evaluate(`document.querySelector('.station-screen').dataset.decoded.trim().replace(/\s+/g,' ')`);
@@ -110,7 +121,7 @@ try {
   await call('Page.enable');await call('Runtime.enable');
   await call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
-  const fixture=createSave({callsign:'BH1QA',keyType:'automatic',automaticKeyWpm:18});
+  const fixture=createSave({callsign:'BH1QA',keyType:'automatic',automaticKeyWpm:fixtureWpm});
   await call('Page.addScriptToEvaluateOnNewDocument',{source:`window.cwgameSystem={qaCapture:true};if(!localStorage.getItem(${JSON.stringify(SAVE_STORAGE_KEY)})){localStorage.setItem(${JSON.stringify(SAVE_STORAGE_KEY)},${JSON.stringify(JSON.stringify([fixture]))});localStorage.setItem(${JSON.stringify(ACTIVE_SAVE_KEY)},${JSON.stringify(fixture.id)});localStorage.setItem('game-morse-adventurer.language.v1','zh-CN');}`});
   await call('Page.navigate',{url:baseUrl});
   await call('Page.bringToFront');
@@ -221,7 +232,7 @@ try {
   assert.equal((await saved()).money,claimed.money);
   await screenshot('10-review-preserved');
   assert.equal(exceptions.length,0,JSON.stringify(exceptions));
-  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
+  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,baseUrl,fixtureWpm,recordedAt:new Date().toISOString(),actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
   console.log(JSON.stringify({passed:true,profile,output}));
 }
 catch(error){
