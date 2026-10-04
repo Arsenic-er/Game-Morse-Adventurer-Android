@@ -70,6 +70,7 @@ test("lights event state has bounded hostile-input normalization", () => {
     version: LIGHTS_EVENT_STATE_VERSION,
     settledRunIds: [],
     storyBest: null,
+    storyLatest: null,
     lifetimeGradePaid: 0,
     practiceRecords: [],
   });

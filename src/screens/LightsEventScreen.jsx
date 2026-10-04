@@ -1,6 +1,8 @@
+import { canContinueChapterFive } from "../game/chapterFiveStory.js";
+import { chapterFiveStoryText } from "./chapterFiveStoryText.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft, Broadcast, Eraser, FloppyDisk, Headphones, Radio, Repeat, Timer, Trophy,
+  ArrowLeft, BookOpenText, Broadcast, Eraser, FloppyDisk, GearSix, Headphones, Radio, Repeat, Timer, Trophy,
 } from "@phosphor-icons/react";
 import { useCwCore } from "../cw/useCwCore.js";
 import { CLEAR_INPUT_GESTURE_LENGTH } from "../cw/inputAnalyzer.js";
@@ -29,7 +31,7 @@ function expectedPlayerText(run) {
   return "";
 }
 
-export function LightsEventScreen({ language, mode, save, inputBlocked = false, onActivityRisk, onSettle, onBack }) {
+export function LightsEventScreen({ language, mode, save, inputBlocked = false, onActivityRisk, onSettle, onContinueStory, onSettings, onBack }) {
   const t = lightsText(language);
   const [run, setRun] = useState(() => {
     const startedAt = new Date();
@@ -43,6 +45,10 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
       startedAt,
     });
   });
+  // Timer-only renders must not cancel an in-flight receive or its start delay.
+  const playbackRunRef = useRef(run);
+  playbackRunRef.current = run;
+  const playbackKey = `${run.runId}:${run.phase}:${run.round}:${run.recoveryRequests}:${run.agnRequestCount}:${run.playbackCallers?.map(({ callsign }) => callsign).join(",")}`;
   const [playbackRetry, setPlaybackRetry] = useState(0);
   const [settlement, setSettlement] = useState(null);
   const [windowActive, setWindowActive] = useState(() => activityPlaybackIsActive(document));
@@ -106,15 +112,15 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
 
   useEffect(() => {
     if (!model.needsPlayback || inputBlocked || !windowActive) return undefined;
-    const activePhase = run.phase;
-    const playbackKey = `${activePhase}:${run.round}:${run.recoveryRequests}:${run.agnRequestCount}:${run.playbackCallers?.map(({ callsign }) => callsign).join(",")}`;
+    const playbackRun = playbackRunRef.current;
+    const activePhase = playbackRun.phase;
     if (playbackKeyRef.current === playbackKey) return undefined;
     playbackKeyRef.current = playbackKey;
     let cancelled = false;
     playbackLifecycle.requestPlayback(window.cwgameSystem?.qaCapture ? 20 : 260, async () => {
       const played = window.cwgameSystem?.qaCapture ? true : model.needsLayeredPlayback
-        ? await cw.playIncomingLayers(lightsPileupPlaybackLayers(currentLightsPileup(run)))
-        : await cw.playIncoming(model.incomingText, run.phase.startsWith("CHASE") ? run.chaseWpm : 18, {
+        ? await cw.playIncomingLayers(lightsPileupPlaybackLayers(currentLightsPileup(playbackRun)))
+        : await cw.playIncoming(model.incomingText, activePhase.startsWith("CHASE") ? playbackRun.chaseWpm : 18, {
             noiseGain: 0.05, signalGain: 0.85, qsbDepth: 0.16, toneHz: 650,
           });
       if (cancelled) return;
@@ -128,7 +134,7 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
     });
     return () => { cancelled = true; playbackLifecycle.clearPlayback(); };
   }, [cw.clearInput, cw.playIncoming, cw.playIncomingLayers, inputBlocked, model.incomingText,
-    model.needsLayeredPlayback, model.needsPlayback, playbackLifecycle, playbackRetry, run, windowActive]);
+    model.needsLayeredPlayback, model.needsPlayback, playbackKey, playbackLifecycle, playbackRetry, windowActive]);
 
   useEffect(() => {
     const active = lightsTimerShouldRun({ phase: run.phase, inputBlocked, windowActive });
@@ -220,6 +226,9 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
     : save.qsoGuidance === "hints" && model.needsPlayback ? model.callerHint || "••• CW •••" : "";
   return (
     <main className="screen lights-event-screen" data-event-mode={mode} data-event-phase={run.phase}
+      data-keyer-wpm={save.automaticKeyWpm} data-player-region={run.playerRegion}
+      data-qa-expected={window.cwgameSystem?.qaCapture ? targetText : undefined}
+      data-qa-contacts={window.cwgameSystem?.qaCapture ? run.contacts.length : undefined}
       data-pulse-count={cw.analysis.pulseCount} data-decoded={cw.analysis.decoded}
       data-valid-qso-count={model.result?.validQsoCount ?? ""}
       data-distinct-region-count={model.result?.distinctRegionCount ?? ""}
@@ -228,6 +237,7 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
         <div><small>{t.kicker}</small><h1>{t.title}</h1></div>
         <span className="lights-mode-badge">{model.modeLabel}</span>
         <div className="lights-identity"><span>{t.station}</span><strong>SIM5LT</strong><small>{t.operator}: {save.callsign}</small></div>
+        {onSettings && <button data-action="lights-settings" onClick={onSettings} aria-label={chapterFiveStoryText(language).settings}><GearSix size={21} /></button>}
         <button onClick={leave} aria-label={t.back}><ArrowLeft size={21} />{t.back}</button>
       </header>
 
@@ -265,6 +275,7 @@ export function LightsEventScreen({ language, mode, save, inputBlocked = false, 
         <button onClick={clear} disabled={!cw.analysis.pulseCount && !run.lastError}><Eraser size={19} />{t.clear}</button>
         <button className="lights-transmit" data-action="lights-transmit" onClick={transmit} disabled={!model.canTransmit || !cw.analysis.pulseCount || cw.isPlaying || cw.isKeying}><Broadcast size={20} weight="fill" />{t.transmit}<kbd>F2</kbd></button>
         <button className="lights-settle" data-action="lights-settle" onClick={settle} disabled={!model.canSettle || Boolean(settlement)}><FloppyDisk size={20} weight="fill" />{settlement ? t.settled : t.settle}</button>
+        {settlement && onContinueStory && canContinueChapterFive(save, mode, settlement.result?.runId) && <button data-action="continue-chapter-five" onClick={onContinueStory}><BookOpenText size={19} />{chapterFiveStoryText(language).continueStory}</button>}
         {model.result?.grade === "none" && <button data-action="lights-retry-control" onClick={retryControl}><Repeat size={19} />{t.retryControl}</button>}
       </footer>
       {settlement && <div className="lights-settlement-banner" role="status"

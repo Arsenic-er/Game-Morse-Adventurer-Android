@@ -49,6 +49,13 @@ function normalizeBest(value) {
   };
 }
 
+function normalizeLatestStory(value) {
+  const best = normalizeBest(value);
+  if (!best) return null;
+  const ids = Array.isArray(value.contactIds) ? value.contactIds.slice(0, 7) : [];
+  return { ...best, contactIds: [...new Set(ids.filter(id => typeof id === "string" && id.length > 0 && id.length <= 96))] };
+}
+
 function normalizePracticeRecord(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value?.dateKey ?? ""))) return null;
   const bestGrade = grade(value.bestGrade);
@@ -65,6 +72,7 @@ export function emptyLightsEventState() {
     version: LIGHTS_EVENT_STATE_VERSION,
     settledRunIds: [],
     storyBest: null,
+    storyLatest: null,
     lifetimeGradePaid: 0,
     practiceRecords: [],
   };
@@ -95,6 +103,7 @@ export function normalizeLightsEventState(value) {
     version: LIGHTS_EVENT_STATE_VERSION,
     settledRunIds,
     storyBest: normalizeBest(source.storyBest),
+    storyLatest: normalizeLatestStory(source.storyLatest),
     lifetimeGradePaid: Math.min(GRADE_BONUS.gold, integer(source.lifetimeGradePaid)),
     practiceRecords: [...records.values()].sort((a, b) => a.dateKey.localeCompare(b.dateKey)).slice(-MAX_PRACTICE_RECORDS),
   };
@@ -118,7 +127,7 @@ function compactIdentifier(value, maximum) {
   return `${normalized.slice(0, maximum - suffix.length)}${suffix}`;
 }
 
-function runSettlementLedgerId(runId) {
+export function runSettlementLedgerId(runId) {
   return compactIdentifier(`lights-run:${String(runId ?? "")}`, 96);
 }
 
@@ -354,6 +363,8 @@ export function settleLightsRun(save, candidate, { observedAt = null, now = null
     ...state,
     settledRunIds: [...state.settledRunIds, result.runId],
     storyBest: result.mode === "story" ? bestResult(state.storyBest, result) : state.storyBest,
+    storyLatest: result.mode === "story" && result.grade !== "none"
+      ? { runId: result.runId, score: result.score, grade: result.grade, completedAt: result.completedAt, contactIds: result.contacts.map(contact => contact.id) } : state.storyLatest,
     lifetimeGradePaid: state.lifetimeGradePaid + gradeMoney,
     practiceRecords,
   });

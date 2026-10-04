@@ -824,3 +824,17 @@ test("Lights reload validation reports both durable fact sets when they disagree
   valid.checkpoints["reloaded-history"].qsoLogCount = 2;
   assert.throws(() => validateLightsQaEvidence(valid), /settled.*reloaded/s);
 });
+
+test("Lights receive effect is keyed to protocol changes, not the 250 ms clock object", () => {
+  const screen = fs.readFileSync(path.join(__dirname, "..", "src", "screens", "LightsEventScreen.jsx"), "utf8");
+  const start = screen.indexOf('    if (!model.needsPlayback');
+  const end = screen.indexOf('\n\n  useEffect', start);
+  const effect = screen.slice(start, end);
+  assert(start > 0 && end > start);
+  assert.match(effect, /const playbackRun = playbackRunRef\.current/);
+  assert.match(effect, /currentLightsPileup\(playbackRun\)/);
+  assert.match(effect, /playbackKey, playbackLifecycle, playbackRetry, windowActive\]\)/);
+  assert.doesNotMatch(effect.slice(effect.lastIndexOf('}, [')), /\brun\b/);
+  const keyLine = screen.split('\n').find(line => line.includes('const playbackKey ='));
+  for (const field of ['runId', 'phase', 'round', 'recoveryRequests', 'agnRequestCount']) assert(keyLine.includes('run.' + field));
+});

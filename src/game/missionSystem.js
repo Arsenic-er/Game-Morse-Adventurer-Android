@@ -1,3 +1,4 @@
+import { lightsStoryCompletion } from "./lightsStoryProgress.js";
 import { expeditionSiteById } from "./expeditionCatalog.js";
 import { normalizeExpeditionSettlementProofs } from "./expeditionRun.js";
 import { personIdForOperator, stationIdentityForCallsign } from "./personIdentity.js";
@@ -667,14 +668,7 @@ function evaluateObjective(definition, logs, save, active = null) {
       && usedRecovery(entry)) ? 1 : 0;
   }
   if (definition.objective === "lights-event") {
-    const best = save?.lightsEventState?.storyBest;
-    const gradeRank = { none: 0, base: 1, silver: 2, gold: 3 };
-    const acceptedAt = Date.parse(active?.acceptedAt ?? "");
-    const completedAt = Date.parse(best?.completedAt ?? "");
-    const baseline = new Set(active?.baselineLightsRunIds ?? []);
-    current = best?.runId && !baseline.has(String(best.runId))
-      && Number.isFinite(acceptedAt) && Number.isFinite(completedAt) && completedAt >= acceptedAt
-      && (gradeRank[best.grade] ?? 0) >= gradeRank.base ? 1 : 0;
+    current = lightsStoryCompletion(save?.lightsEventState, active?.acceptedAt, active?.baselineLightsRunIds) ? 1 : 0;
   }
   if (definition.objective === "hill-expedition") {
     current = verifiedExpeditionCompletion(save, active, logs) ? 1 : 0;
