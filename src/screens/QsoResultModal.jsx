@@ -1,3 +1,4 @@
+const STORY_FOUR_CONTINUE_LABEL = { "zh-CN": "继续第四章", "zh-TW": "繼續第四章", en: "Continue Chapter Four", ja: "第4章を続ける", es: "Continuar el capítulo cuatro", de: "Kapitel vier fortsetzen", ru: "Продолжить четвёртую главу" };
 const STORY_THREE_CONTINUE_LABEL = { "zh-CN": "继续第三章", "zh-TW": "繼續第三章", en: "Continue Chapter Three", ja: "第3章を続ける", es: "Continuar el capítulo tres", de: "Kapitel drei fortsetzen", ru: "Продолжить третью главу" };
 const STORY_TWO_CONTINUE_LABEL = { "zh-CN": "继续第二章", "zh-TW": "繼續第二章", en: "Continue Chapter Two", ja: "第2章を続ける", es: "Continuar el capítulo dos", de: "Kapitel zwei fortsetzen", ru: "Продолжить вторую главу" };
 const STORY_CONTINUE_LABEL = { "zh-CN": "继续第一章", "zh-TW": "繼續第一章", en: "Continue Chapter One", ja: "第1章を続ける", es: "Continuar el capítulo uno", de: "Kapitel eins fortsetzen", ru: "Продолжить первую главу" };
@@ -193,7 +194,7 @@ export function QsoResultModal({
 }) {
   const t = TEXT[language] ?? TEXT.en;
   const reviewT = REVIEW_TEXT[language] ?? REVIEW_TEXT.en;
-  const storyLabels = storyChapter === 3 ? STORY_THREE_CONTINUE_LABEL : storyChapter === 2 ? STORY_TWO_CONTINUE_LABEL : STORY_CONTINUE_LABEL;
+  const storyLabels = storyChapter === 4 ? STORY_FOUR_CONTINUE_LABEL : storyChapter === 3 ? STORY_THREE_CONTINUE_LABEL : storyChapter === 2 ? STORY_TWO_CONTINUE_LABEL : STORY_CONTINUE_LABEL;
   return (
     <div className="qso-result-backdrop">
       <section className={`qso-result-modal ${failed ? "failed" : "success"}`} role="dialog" aria-modal="true" aria-labelledby="qso-result-title">
@@ -248,7 +249,7 @@ export function QsoResultModal({
         )}
 
         <footer>
-          {!failed && saved && onContinueStory && <button className="qso-result-primary" data-action={storyChapter === 3 ? "continue-chapter-three" : storyChapter === 2 ? "continue-chapter-two" : "continue-chapter-one"} onClick={onContinueStory}><BookOpenText size={21} />{storyLabels[language] ?? storyLabels.en}</button>}
+          {!failed && saved && onContinueStory && <button className="qso-result-primary" data-action={storyChapter === 4 ? "continue-chapter-four" : storyChapter === 3 ? "continue-chapter-three" : storyChapter === 2 ? "continue-chapter-two" : "continue-chapter-one"} onClick={onContinueStory}><BookOpenText size={21} />{storyLabels[language] ?? storyLabels.en}</button>}
           {failed ? (
             <button className="qso-result-primary" onClick={onRestart}><ArrowClockwise size={21} weight="bold" />{t.restart}</button>
           ) : !saved ? (

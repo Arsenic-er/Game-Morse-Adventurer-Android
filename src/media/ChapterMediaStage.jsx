@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { chapterMedia } from "./chapterMediaCatalog.js";
+import { ChapterSceneEventContext } from "./chapterSceneEventContext.js";
 import { normalizeChapterMediaSettings } from "./chapterMediaSettings.js";
 import { chapterSceneEffects, chapterSceneStyle, nextSceneEventDelay } from "./chapterSceneEffects.js";
 
@@ -152,7 +153,7 @@ export function ChapterMediaStage({ chapter, settings, paused = false, children 
         {layers.has("lighthouse") && <div className="chapter-scene-layer chapter-scene-lighthouse" />}
         {layers.has("lightning") && <div key={eventPulse} className={`chapter-scene-layer chapter-scene-lightning ${eventPulse ? "is-flashing" : ""}`} />}
       </div>}
-      {children}
+      <ChapterSceneEventContext.Provider value={eventPulse}>{children}</ChapterSceneEventContext.Provider>
       {media && <div className="chapter-audio" aria-hidden="true">
         <audio ref={ambienceRef} src={media.ambience} preload="metadata" loop />
         <audio ref={musicRef} src={media.music} preload="metadata" loop />

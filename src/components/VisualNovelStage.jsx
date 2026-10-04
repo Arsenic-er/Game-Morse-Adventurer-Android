@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ArrowLeft, BookOpenText, Eye, GearSix, X } from "@phosphor-icons/react";
 import { visualNovelText } from "../screens/visualNovelText.js";
+import { ChapterSceneEventContext } from "../media/chapterSceneEventContext.js";
 
 function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHistory, onHide, onNotes, hasNotes, primaryAction }) {
   const [line, setLine] = useState(0);
@@ -84,6 +85,7 @@ function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHisto
 
 export function VisualNovelStage({ language, beat, artwork, background, artLabel, chapter, title, mode, safety, backLabel, settingsLabel, artViewLabel, onBack, onSettings, primaryLabel, onPrimary, inputBlocked = false, busy = false, children, context, toolbar, overlay, sceneLayers = [], className = "", primaryAction = "chapter-one-primary", ...data }) {
   const t = visualNovelText(language);
+  const sceneEventPulse = useContext(ChapterSceneEventContext);
   const [modal, setModal] = useState(null);
   const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState(true);
@@ -131,7 +133,9 @@ export function VisualNovelStage({ language, beat, artwork, background, artLabel
     <figure className="vn-art" aria-label={artLabel}>
       <img key={background} className="vn-background" src={background} alt={beat.asset === "portrait" ? "" : artLabel} />
       {sceneLayers.length > 0 && <div className="vn-atmosphere" aria-hidden="true" style={{ "--chapter-scene": `url(${background})` }}>
-        {sceneLayers.map(layer => <div key={layer} className={`chapter-scene-layer chapter-scene-${layer}`} />)}
+        {sceneLayers.map(layer => <div key={layer === "lightning" ? layer + "-" + sceneEventPulse : layer}
+          data-scene-event-pulse={layer === "lightning" ? sceneEventPulse : undefined}
+          className={`chapter-scene-layer chapter-scene-${layer}${layer === "lightning" && sceneEventPulse > 0 ? " is-flashing" : ""}`} />)}
       </div>}
       {beat.asset === "portrait" && <img className="vn-portrait" src={artwork} alt={artLabel} />}
     </figure>
