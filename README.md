@@ -6,7 +6,7 @@
 
 [**English**](./README.md) · [**简体中文**](./README.zh-CN.md) · [**繁體中文**](./README.zh-TW.md) · [**日本語**](./README.ja.md) · [**Español**](./README.es.md) · [**Deutsch**](./README.de.md) · [**Русский**](./README.ru.md)
 
-[**Semantic model and training data**](https://github.com/Arsenic-er/cwformer)
+[**Semantic model and training data**](https://github.com/Arsenic-er/cwformer) · [**Android build guide**](./README.android.md)
 
 **v0.45.0**: Chapters 5–15 and the initial Open Station dashboard are implemented. Chapter 11 listening watch makes silence a bounded operating decision; Chapter 12 storm relay verifies one revision-two fictional drill packet; Chapter 13 night operations completes three scheduled contacts; Chapter 14 final promise closes SORA's fixed account without storing player prose; Chapter 15 ordinary QSO seals the first page and unlocks Open Station goals. All play remains offline and fictional; no real emergency traffic, organization, frequency, free chat, or online ranking is represented.
 

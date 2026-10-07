@@ -24,11 +24,22 @@
     "semantic:model:sync": "node scripts/sync-semantic-model.mjs",
     "semantic:model:update": "node scripts/sync-semantic-model.mjs --update",
     "desktop:dev": "pnpm semantic:model:sync && vite build && electron .",
-    "desktop:build": "pnpm semantic:model:sync && pnpm build && electron-builder --win portable"
+    "desktop:build": "pnpm semantic:model:sync && pnpm build && electron-builder --win portable",
+    "android:sync": "pnpm build && cap sync android",
+    "android:debug": "pnpm android:sync && cd android && ./gradlew --no-daemon assembleDebug",
+    "android:bundle": "pnpm android:sync && cd android && ./gradlew --no-daemon bundleRelease",
+    "android:assets": "capacitor-assets generate --android --assetPath build --iconBackgroundColor \\#02080D --iconBackgroundColorDark \\#02080D --splashBackgroundColor \\#02080D --splashBackgroundColorDark \\#02080D --logoSplashScale 0.28",
+    "qa:android:semantic": "node scripts/qa-android-semantic.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/dialog": "8.0.1",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4",
     "@phosphor-icons/react": "^2.1.10",
     "onnxruntime-node": "1.27.0",
+    "onnxruntime-web": "1.30.0",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
@@ -57,7 +68,9 @@
       {
         "from": "runtime-models",
         "to": "models",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "asar": true,
@@ -75,6 +88,9 @@
     }
   },
   "devDependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3",
     "@vitejs/plugin-react": "5.0.4",
     "electron": "^43.1.0",
     "electron-builder": "^26.15.3",

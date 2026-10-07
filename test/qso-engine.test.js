@@ -234,7 +234,7 @@ test("optional answers accept semantic and contextual variants while rejecting e
     pendingQuestion: "LOCATION",
   });
   contextual = submitPlayerMessage(contextual, "PIXEL CITY K", {
-    semanticResult: { ...contextualSemantics, provider: "onnxruntime-node" },
+    semanticResult: { ...contextualSemantics, provider: "onnxruntime-web" },
   });
   assert.equal(contextual.optionalExchangeOutcome, "answered");
 

@@ -7,8 +7,16 @@ import "./chapter-one-review.css";
 import "./visual-novel.css";
 import "./review-incoming-caption.css";
 
-createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+async function mount() {
+  if (globalThis.window?.Capacitor?.getPlatform?.() === "android") {
+    const { bootstrapAndroidPlatform } = await import("./platform/androidSystem.js");
+    await bootstrapAndroidPlatform();
+  }
+  createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+}
+
+void mount();

@@ -1,1 +1,2 @@
 runtime-models/*.runtime-contract.json text eol=lf
+android/gradlew.bat text eol=crlf

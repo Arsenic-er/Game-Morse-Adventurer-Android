@@ -173,7 +173,7 @@ function finalNpcMessage(qso, outcome = null) {
 
 function optionalSemanticMatch(semanticResult, spec, tokens) {
   const explicitTopic = spec.aliases.some((alias) => tokens.includes(alias));
-  const trustedContext = semanticResult?.provider === "onnxruntime-node";
+  const trustedContext = ["onnxruntime-node", "onnxruntime-web"].includes(semanticResult?.provider);
   return (explicitTopic || trustedContext)
     && semanticResult?.safeToCommit === true
     && Number(semanticResult?.acts?.PROVIDE ?? 0) >= .55
