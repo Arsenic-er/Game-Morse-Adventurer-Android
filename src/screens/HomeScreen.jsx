@@ -1,3 +1,5 @@
+import { chapterSevenStoryText } from "./chapterSevenStoryText.js";
+import { chapterSevenStoryModel } from "../game/chapterSevenStory.js";
 import { chapterSixStoryText } from "./chapterSixStoryText.js";
 import { chapterFiveStoryText } from "./chapterFiveStoryText.js";
 import { useEffect, useState } from "react";
@@ -545,7 +547,7 @@ function WarehouseModal({ language, save, onEquipItem, onUnlockTechnology, onClo
   );
 }
 
-export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTechnology, onAcceptMission, onClaimMission, onAbandonMission, onEnterChapterOne, onEnterChapterTwo, onEnterChapterThree, onEnterChapterFour, onEnterChapterFive, onEnterChapterSix, onEnterLights, onEnterExpedition, onEnterQslStory, onEnterServiceNet, onEnterCoordinateRelay, onEnterContest, onEnterListening, onEnterStormRelay, onEnterNightOperations, onEnterFinalPromise, onSettleFirstPage, onUpdateOpenStationGoal, onConfirmQslChoice, onEnterStation, onEnterPractice, onBack, onSettings }) {
+export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTechnology, onAcceptMission, onClaimMission, onAbandonMission, onEnterChapterOne, onEnterChapterTwo, onEnterChapterThree, onEnterChapterFour, onEnterChapterFive, onEnterChapterSix, onEnterChapterSeven, onEnterLights, onEnterExpedition, onEnterQslStory, onEnterServiceNet, onEnterCoordinateRelay, onEnterContest, onEnterListening, onEnterStormRelay, onEnterNightOperations, onEnterFinalPromise, onSettleFirstPage, onUpdateOpenStationGoal, onConfirmQslChoice, onEnterStation, onEnterPractice, onBack, onSettings }) {
   const t = TEXT[language] ?? TEXT.en;
   const openStationText = OPEN_STATION_TEXT[language] ?? OPEN_STATION_TEXT.en;
   const location = getLocation(save.locationId);
@@ -620,6 +622,7 @@ export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTe
       {onEnterChapterOne && !save.missionState?.claimedMissionIds?.includes("story-01") && <button className="home-chapter-one-button" data-action="enter-chapter-one-home" onClick={onEnterChapterOne}><BookOpenText size={20} />{chapterOneStoryLabels(language).entry}</button>}
       <button className="home-people-qsl-button" data-action="open-people-qsl" aria-label={t.peopleQsl} onClick={() => setPanel("people-qsl")}><Users size={20} weight="fill" />{t.peopleQsl}</button>
       {expeditionReplay && <button className="home-expedition-button" data-action="enter-expedition-home" aria-label={t.expedition} onClick={onEnterExpedition}><Broadcast size={20} weight="fill" />{t.expedition}</button>}
+      {onEnterChapterSeven && ["available","active","ready"].includes(chapterSevenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-seven-home" onClick={onEnterChapterSeven}><BookOpenText size={20} />{chapterSevenStoryText(language).entry}</button>}
       {qslStoryReplay && <button className="home-qsl-story-button" data-action="enter-qsl-story-home" aria-label={t.qslStory} onClick={onEnterQslStory}><FileMagnifyingGlass size={20} weight="fill" />{t.qslStory}</button>}
       {serviceNetReplay && <button className="home-service-net-button" data-action="enter-service-net-home" aria-label={t.serviceNet} onClick={onEnterServiceNet}><Broadcast size={20} weight="fill" />{t.serviceNet}</button>}
       {coordinateRelayReplay && <button className="home-coordinate-relay-button" data-action="enter-coordinate-relay-home" aria-label={t.coordinateRelay} onClick={onEnterCoordinateRelay}><GridFour size={20} weight="fill" />{t.coordinateRelay}</button>}
@@ -636,7 +639,7 @@ export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTe
       {panel === "store" && <StoreModal language={language} save={save} onPurchase={onPurchase} onClose={() => setPanel(null)} />}
       {panel === "log" && <QsoLogModal language={language} save={save} onClose={() => setPanel(null)} />}
       {panel === "achievements" && <AchievementsModal language={language} save={save} onClose={() => setPanel(null)} />}
-      {panel === "missions" && <MissionCenterModal language={language} save={save} onAccept={onAcceptMission} onClaim={onClaimMission} onAbandon={onAbandonMission} onLaunchChapterOne={onEnterChapterOne} onLaunchChapterTwo={onEnterChapterTwo} onLaunchChapterThree={onEnterChapterThree} onLaunchChapterFour={onEnterChapterFour} onLaunchChapterFive={onEnterChapterFive} onLaunchChapterSix={onEnterChapterSix} onLaunchLights={onEnterLights} onLaunchExpedition={onEnterExpedition} onLaunchQslStory={onEnterQslStory} onLaunchServiceNet={onEnterServiceNet} onLaunchCoordinateRelay={onEnterCoordinateRelay} onLaunchContest={onEnterContest} onLaunchListening={onEnterListening} onLaunchStormRelay={onEnterStormRelay} onLaunchNightOperations={onEnterNightOperations} onLaunchFinalPromise={onEnterFinalPromise} onLaunchFirstPageQso={onEnterStation} onOpenStation={() => setPanel("open-station")} onClose={() => setPanel(null)} />}
+      {panel === "missions" && <MissionCenterModal language={language} save={save} onAccept={onAcceptMission} onClaim={onClaimMission} onAbandon={onAbandonMission} onLaunchChapterOne={onEnterChapterOne} onLaunchChapterTwo={onEnterChapterTwo} onLaunchChapterThree={onEnterChapterThree} onLaunchChapterFour={onEnterChapterFour} onLaunchChapterFive={onEnterChapterFive} onLaunchChapterSix={onEnterChapterSix} onLaunchChapterSeven={onEnterChapterSeven} onLaunchLights={onEnterLights} onLaunchExpedition={onEnterExpedition} onLaunchQslStory={onEnterQslStory} onLaunchServiceNet={onEnterServiceNet} onLaunchCoordinateRelay={onEnterCoordinateRelay} onLaunchContest={onEnterContest} onLaunchListening={onEnterListening} onLaunchStormRelay={onEnterStormRelay} onLaunchNightOperations={onEnterNightOperations} onLaunchFinalPromise={onEnterFinalPromise} onLaunchFirstPageQso={onEnterStation} onOpenStation={() => setPanel("open-station")} onClose={() => setPanel(null)} />}
       {panel === "first-page" && <FirstPageModal language={language} save={save} onSettle={onSettleFirstPage} onClose={() => setPanel(null)} />}
       {panel === "open-station" && <OpenStationModal language={language} save={save} onUpdateGoal={onUpdateOpenStationGoal} onClose={() => setPanel(null)} />}
       {panel === "people-qsl" && <PeopleAndQslModal language={language} save={save} onConfirmChoice={onConfirmQslChoice} onClose={() => setPanel(null)} />}

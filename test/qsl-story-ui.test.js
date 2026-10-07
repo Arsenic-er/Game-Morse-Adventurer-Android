@@ -65,7 +65,7 @@ test("Chapter 7 renders both accounts, real radio input, choices, and no portrai
   assert.doesNotMatch(source, /<input\b/);
   assert.match(source, /data-settlement-attempts=\{settlementAttempts\}/);
   assert.match(source, /data-settlement-reason=\{settlementReason\}/);
-  assert.match(source, /data-action="qsl-story-settle" disabled=\{inputBlocked\}/);
+  assert.match(source, /data-action="qsl-story-settle" disabled=\{inputBlocked \|\| settled\}/);
   assert.match(source, /settled && <p className="qsl-story-settlement-banner" role="status">\{settledText\}/);
   assert.match(source, /run\.phase !== QSL_STORY_PHASES\.COMPLETED && run\.errors\.length > 0/);
   assert.deepEqual(Object.keys(QSL_STORY_SETTLED_TEXT), ["zh-CN", "zh-TW", "ja", "en", "es", "de", "ru"]);

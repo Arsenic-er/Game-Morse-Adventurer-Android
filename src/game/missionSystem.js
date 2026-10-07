@@ -582,7 +582,7 @@ function confirmedChapterSevenSource(save) {
   ));
 }
 
-function verifiedQslStoryCompletion(save, active, logs) {
+export function verifiedQslStoryCompletion(save, active, logs) {
   const acceptedAt = Date.parse(own(active, "acceptedAt") ?? "");
   if (!Number.isFinite(acceptedAt)) return false;
   const baseline = new Set(Array.isArray(own(active, "baselineQslStoryRunIds"))

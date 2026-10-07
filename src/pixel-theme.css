@@ -2073,6 +2073,13 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .qsl-card-list article > div { grid-template-columns: 1fr; }
   .home-expedition-button, .home-people-qsl-button, .home-qsl-story-button, .home-service-net-button, .home-coordinate-relay-button, .home-structured-message-button { right: 12px; max-width: calc(100% - 24px); }
   .qsl-story-screen { min-width: 0; }
+  .qsl-story-topbar { flex-wrap: wrap; gap: 10px; }
+  .qsl-story-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .qsl-story-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .qsl-story-console { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .qsl-story-console > * { min-width: 0; }
+  .qsl-story-message > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .qsl-story-accounts p, .qsl-story-message code { overflow-wrap: anywhere; }
   .qsl-story-accounts { grid-template-columns: 1fr; }
   .qsl-story-choices { grid-template-columns: 1fr; }
   .service-net-screen { min-width: 0; }

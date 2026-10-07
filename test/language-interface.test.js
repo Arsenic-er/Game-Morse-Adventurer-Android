@@ -163,7 +163,7 @@ test("every interface dictionary has the same non-empty shape in all seven langu
     ["src/screens/expeditionText.js", "EXPEDITION_TEXT"],
     ["src/screens/qslStoryText.js", "QSL_STORY_TEXT"],
     ["src/screens/serviceNetText.js", "SERVICE_NET_TEXT"],
-    ["src/screens/PeopleAndQslModal.jsx", "QSL_TEXT"],
+    ["src/screens/peopleAndQslText.js", "QSL_TEXT"],
     ["src/screens/MissionCenterModal.jsx", "TEXT"],
     ["src/screens/QsoResultModal.jsx", "TEXT"],
     ["src/screens/QsoResultModal.jsx", "REVIEW_TEXT"],
@@ -185,6 +185,8 @@ test("chapters six through ten expose responsive portrait-free seven-language in
   const contest = read("src/screens/ContestScreen.jsx");
   const structuredMessages = read("src/screens/StructuredMessageLogModal.jsx");
   const people = read("src/screens/PeopleAndQslModal.jsx");
+  const peopleCopy = read("src/screens/peopleAndQslText.js");
+  assert.match(people, /import \{ QSL_TEXT \} from "\.\/peopleAndQslText\.js"/);
   const app = read("src/App.jsx");
   const home = read("src/screens/HomeScreen.jsx");
   const mission = read("src/screens/MissionCenterModal.jsx");
@@ -219,7 +221,7 @@ test("chapters six through ten expose responsive portrait-free seven-language in
     "qsl.player.hill-signal", "qsl.operator.sora-hill-reply",
     "qsl.player.lights-contact", "qsl.operator.lights-reply",
     "qsl.player.clarification-request", "qsl.operator.sora-clarification",
-  ]) assert.match(people, new RegExp(`"${key.replaceAll(".", "\\.")}"`));
+  ]) assert.match(peopleCopy, new RegExp(`"${key.replaceAll(".", "\\.")}"`));
   assert.match(serviceNet, /data-testid="service-net-screen"/);
   assert.match(serviceNet, /data-simulation="fictional-public-service"/);
   assert.match(serviceNet, /data-portrait-visible="false"/);
