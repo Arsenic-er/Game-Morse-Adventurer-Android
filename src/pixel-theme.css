@@ -2252,3 +2252,16 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .open-station-lines article:last-child { grid-column: 1; }
   .open-station-recent article { grid-template-columns: 1fr; }
 }
+
+/* Chapter Eight: keep localized controls inside narrow activity panels. */
+@media (max-width: 820px) {
+  .service-net-screen { min-width: 0; }
+  .service-net-topbar { flex-wrap: wrap; gap: 10px; }
+  .service-net-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .service-net-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .service-net-layout { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .service-net-layout > * { min-width: 0; }
+  .service-net-meter { flex-wrap: wrap; }
+  .service-net-message > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .service-net-current code, .service-net-message code { overflow-wrap: anywhere; }
+}

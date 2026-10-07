@@ -183,7 +183,7 @@ function genericTraffic({ message, selfCallsign, peerCallsign, pendingQuestion }
   }
   const rstMatch = compact.match(/RST([1-5][1-9][1-9])/);
   if (rstMatch) slots.push(Object.freeze({ topic: "RST", role: "VALUE", value: rstMatch[1], confidence: 1 }));
-  if (tokens.includes("R") || tokens.includes("RR")) acts.ACK = 1;
+  if (tokens.includes("R") || tokens.includes("RR") || tokens.includes("ACK")) acts.ACK = 1;
   if (tokens.includes("TNX") || tokens.includes("TKS")) acts.THANKS = 1;
   if (tokens.includes("73") || tokens.includes("SK")) acts.SIGNOFF = 1;
   if (tokens.includes("AGN") || normalized.includes("?")) acts.ASK = 1;
