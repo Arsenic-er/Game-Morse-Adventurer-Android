@@ -196,6 +196,7 @@ function failedAttempt(run, error, at, stage) {
   const failures = attempts.filter((attempt) => attempt.stage === "READBACK").length;
   return transition(run, {
     attempts, lastError: error,
+    readbackCompletedAt: null, relaySentAt: null,
     phase: failures >= 3 ? COORDINATE_RELAY_PHASES.FAILED : COORDINATE_RELAY_PHASES.FIELD_CORRECTION,
     failureReason: failures >= 3 ? "TOO_MANY_ERRORS" : null,
     completedAt: failures >= 3 ? at : null,
@@ -222,6 +223,7 @@ export function submitCoordinateRelayText(value, input, semanticResult, observed
   const command = recovery(input);
   if (command) return transition(run, {
     phase: COORDINATE_RELAY_PHASES.RECEIVE_PACKET,
+    readbackCompletedAt: null, relaySentAt: null,
     recoveryActions: freeze([...run.recoveryActions, command].slice(-12)),
     replyWpm: command === "QRS" ? Math.max(5, run.replyWpm - 3) : run.replyWpm,
     lastError: null,
@@ -300,7 +302,10 @@ export function normalizeCoordinateRelayRun(value) {
     const relayRequired = [COORDINATE_RELAY_PHASES.RELAY_CONFIRMATION, COORDINATE_RELAY_PHASES.COMPLETED].includes(run.phase);
     if (!run.runId || !run.playerCallsign || !source || !relay || run.simulation !== "fictional-pixel-grid" || !PHASES.has(run.phase) || !packet || !attempts || !recoveryActions || run.replyWpm == null || run.elapsedMilliseconds == null || run.retryCount == null || !run.startedAt
       || run.runId !== runIdForNormalized(run) || terminal !== Boolean(run.completedAt) || (run.completedAt && Date.parse(run.completedAt) < Date.parse(run.startedAt))
-      || readbackRequired !== Boolean(run.readbackCompletedAt) || relayRequired !== Boolean(run.relaySentAt)
+      || (readbackRequired && !run.readbackCompletedAt) || (relayRequired && !run.relaySentAt)
+      || (!terminal && !readbackRequired && run.readbackCompletedAt) || (!terminal && !relayRequired && run.relaySentAt)
+      || (run.relaySentAt && !run.readbackCompletedAt)
+      || (run.completedAt && Date.parse(run.completedAt) < Date.parse(run.relaySentAt ?? run.readbackCompletedAt ?? run.startedAt))
       || (run.readbackCompletedAt && Date.parse(run.readbackCompletedAt) < Date.parse(run.startedAt)) || (run.relaySentAt && Date.parse(run.relaySentAt) < Date.parse(run.readbackCompletedAt ?? ""))
       || (run.phase === COORDINATE_RELAY_PHASES.FAILED && !FAILURES.has(run.failureReason)) || (run.phase !== COORDINATE_RELAY_PHASES.FAILED && run.failureReason !== null)
       || (run.lastError !== null && !ERRORS.has(run.lastError))) return null;

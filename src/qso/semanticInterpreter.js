@@ -26,7 +26,7 @@ export const TRAFFIC_REGISTERS = Object.freeze([
 const TOPIC_KEYWORDS = Object.freeze({
   NAME: ["NAME"],
   AGE: ["AGE"],
-  LOCATION: ["QTH", "LOC"],
+  LOCATION: ["QTH", "LOC", "GRID"],
   WEATHER: ["WX", "WEATHER"],
   POWER: ["PWR", "POWER", "W"],
   RIG: ["RIG", "RADIO"],
