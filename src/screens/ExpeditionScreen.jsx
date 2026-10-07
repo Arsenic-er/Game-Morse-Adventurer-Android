@@ -1,5 +1,7 @@
+import { canContinueChapterSix } from "../game/chapterSixStory.js";
+import { chapterSixStoryText } from "./chapterSixStoryText.js";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, BatteryHigh, Broadcast, CheckCircle, MapPin, Radio, Warning } from "@phosphor-icons/react";
+import { ArrowLeft, BatteryHigh, BookOpenText, Broadcast, CheckCircle, GearSix, MapPin, Radio, Warning } from "@phosphor-icons/react";
 import { EXPEDITION_SITES, createExpeditionLoadout } from "../game/expeditionCatalog.js";
 import {
   advanceExpeditionSetup, attemptExpeditionSetup, beginExpeditionCq, createExpeditionRun,
@@ -22,7 +24,7 @@ function initialRun(save) {
   });
 }
 
-export function ExpeditionScreen({ language, save, inputBlocked = false, onActivityRisk, onRunChange, onSettle, onBack }) {
+export function ExpeditionScreen({ language, save, inputBlocked = false, onActivityRisk, onRunChange, onSettle, onContinueStory, onSettings, onBack }) {
   const t = EXPEDITION_TEXT[language] ?? EXPEDITION_TEXT.en;
   const [run, setRun] = useState(() => initialRun(save));
   const [exchange, setExchange] = useState("");
@@ -133,6 +135,8 @@ export function ExpeditionScreen({ language, save, inputBlocked = false, onActiv
     className="screen expedition-screen"
     data-testid="expedition-screen"
     data-expedition-phase={model.phase}
+    data-expedition-run-id={run.runId}
+    data-expedition-settled={settled}
     data-expedition-elapsed-ms={run.elapsedMilliseconds}
     data-expedition-setup-mistakes={run.setupMistakes}
     data-expedition-failure-reason={run.failureReason ?? ""}
@@ -143,6 +147,7 @@ export function ExpeditionScreen({ language, save, inputBlocked = false, onActiv
     <header className="expedition-topbar">
       <div><Broadcast size={28} weight="fill" /><span>CHAPTER 06</span><h1>{t.title}</h1></div>
       <b>{save.callsign}</b>
+      {onSettings && <button data-action="expedition-settings" onClick={onSettings} aria-label={chapterSixStoryText(language).settings}><GearSix size={19} /></button>}
       <button data-action="expedition-back" onClick={requestLeave}><ArrowLeft size={19} />{t.leave}</button>
     </header>
     {inputBlocked && <div className="expedition-paused" role="status">{t.paused}</div>}
@@ -164,7 +169,7 @@ export function ExpeditionScreen({ language, save, inputBlocked = false, onActiv
         {model.canSendExchange && <section className="expedition-exchange"><h2>{t.exchange}</h2><p>{t.exchangeHint}</p><code>{model.exchangeHint}</code><input value={exchange} maxLength={240} disabled={inputBlocked || semanticBusy} onChange={(event) => setExchange(event.target.value.toUpperCase())} aria-label={t.exchange} /><button data-action="expedition-send-exchange" disabled={inputBlocked || semanticBusy || !exchange.trim()} onClick={submitExchange}>{t.sendExchange}</button></section>}
         {model.phase === "recovering" && <section className="expedition-recovery"><p>{model.failureText}</p><button data-action="expedition-agn" disabled={inputBlocked} onClick={() => update(requestExpeditionRecovery(run, "AGN", nowIso()))}>{t.agn}</button><button data-action="expedition-qrs" disabled={inputBlocked} onClick={() => update(requestExpeditionRecovery(run, "QRS", nowIso()))}>{t.qrs}</button></section>}
         {model.failureText && model.phase !== "recovering" && <p className="expedition-warning"><Warning />{model.failureText}</p>}
-        {model.phase === "completed" && <section className="expedition-result"><CheckCircle size={44} /><h2>{t.success}</h2><button data-action="expedition-settle" disabled={inputBlocked || settled} onClick={settle}>{t.settle}</button></section>}
+        {model.phase === "completed" && <section className="expedition-result"><CheckCircle size={44} /><h2>{t.success}</h2><button data-action="expedition-settle" disabled={inputBlocked || settled} onClick={settle}>{t.settle}</button>{settled && onContinueStory && canContinueChapterSix(save, run.runId) && <button data-action="continue-chapter-six" onClick={onContinueStory}><BookOpenText size={19} />{chapterSixStoryText(language).continueStory}</button>}</section>}
         {model.canRetry && <section className="expedition-result failed"><Warning size={44} /><h2>{t.failed}</h2><button data-action="expedition-retry" disabled={inputBlocked} onClick={() => update(retryExpeditionRun(run, { runId: runId(), startedAt: nowIso() }))}>{t.retry}</button></section>}
       </article>
     </section>

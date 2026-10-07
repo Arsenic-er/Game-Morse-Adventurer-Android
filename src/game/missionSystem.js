@@ -513,7 +513,7 @@ function logsForMission(save, active) {
   }
 }
 
-function verifiedExpeditionCompletion(save, active, logs) {
+export function verifiedExpeditionCompletion(save, active, logs) {
   const acceptedAt = Date.parse(own(active, "acceptedAt") ?? "");
   if (!Number.isFinite(acceptedAt)) return false;
   const baselineIds = own(active, "baselineExpeditionRunIds");
