@@ -2278,3 +2278,14 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .coordinate-relay-input > div { display: flex; flex-wrap: wrap; gap: 8px; }
   .coordinate-relay-packet code, .coordinate-relay-input code, .coordinate-relay-confirm code { overflow-wrap: anywhere; }
 }
+
+/* Chapter Ten: long localized controls and exchanges stay within narrow viewports. */
+@media (max-width: 820px) {
+  .contest-screen, .contest-layout > * { min-width: 0; }
+  .contest-topbar { flex-wrap: wrap; gap: 10px; }
+  .contest-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .contest-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .contest-layout { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .contest-exchange code, .contest-run-cq code, .contest-keyer strong { overflow-wrap: anywhere; }
+  .contest-keyer > div, .contest-mode-select > div, .contest-briefing > div { display: flex; flex-wrap: wrap; gap: 8px; }
+}
