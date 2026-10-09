@@ -9,7 +9,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           const normalizedId = id.replaceAll("\\", "/");
-          if (/\/src\/game\/(?:listening(?:Run|Completion)|stormRelay(?:Run|Completion)|nightOperations(?:Run|Completion)|finalPromise(?:Run|Completion)|firstPage(?:State|Completion)|openStationState)\.js$/u.test(normalizedId)) {
+          if (/\/src\/game\/(?:contest(?:Run|Completion)|coordinateRelay(?:Run|Completion)|serviceNet(?:Run|Completion)|listening(?:Run|Completion)|stormRelay(?:Run|Completion)|nightOperations(?:Run|Completion)|finalPromise(?:Run|Completion)|firstPage(?:State|Completion)|openStationState)\.js$/u.test(normalizedId)) {
             return "story-continuation-engine";
           }
           if (!id.includes("node_modules")) return undefined;

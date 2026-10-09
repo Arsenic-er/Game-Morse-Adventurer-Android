@@ -14,7 +14,7 @@ test("Chapter 11 screen uses physical CW and records bounded silence without a p
   assert.match(screen, /data-testid="listening-screen"/);
   assert.match(screen, /data-simulation="fictional-listening-story"/);
   assert.match(screen, /data-listening-phase=\{run\.phase\}/);
-  assert.match(screen, /data-listening-paused=\{inputBlocked \|\| !windowActive\}/);
+  assert.match(screen, /data-listening-paused=\{inputBlocked \|\| leaveOpen \|\| !windowActive\}/);
   assert.match(screen, /data-pulse-count=\{cw\.analysis\.pulseCount\}/);
   assert.match(screen, /data-decoded=\{cw\.analysis\.decoded\}/);
   assert.match(screen, /data-portrait-visible="false"/);
@@ -33,20 +33,14 @@ test("Chapter 11 screen uses physical CW and records bounded silence without a p
   assert.doesNotMatch(screen, /<img[^>]+portrait/i);
 });
 
-test("Chapter 11 decision timer survives active-clock run updates", () => {
-  const screen = read("src/screens/ListeningScreen.jsx");
-  assert.match(
-    screen,
-    /setRun\(\(current\) => \{[\s\S]*finishListeningWait\(current, nowIso\(\)\)[\s\S]*onRunChangeRef\.current\(next\)[\s\S]*return next;/,
-  );
-  assert.match(
-    screen,
-    /\}, \[inputBlocked, run\.phase, windowActive\]\);/,
-  );
-  assert.doesNotMatch(
-    screen,
-    /finishListeningWait\(run, nowIso\(\)\)[\s\S]*\[inputBlocked, run, update, windowActive\]/,
-  );
+test("Chapter 11 decision timer survives clock updates and guards paused or stale callbacks", () => {
+ const screen=read("src/screens/ListeningScreen.jsx");
+ assert.match(screen,/const current = runRef\.current;/);
+ assert.match(screen,/gateRef\.current/);assert.match(screen,/current\.runId !== requested\.runId/);
+ assert.match(screen,/current\.callCount !== requested\.callCount/);
+ assert.match(screen,/update\(finishListeningWait\(current, nowIso\(\)\)\)/);
+ assert.match(screen,/\[inputBlocked, leaveOpen, run\.runId, run\.callCount, run\.phase, windowActive, update\]/);
+ assert.doesNotMatch(screen,/setRun\(\(current\)/);
 });
 
 test("Chapter 11 copy is nonempty and shape-identical in all seven languages", () => {
@@ -68,11 +62,18 @@ test("Chapter 11 route, mission, replay, leave guard, and responsive contracts a
   assert.match(app, /screen === "listening"/);
   assert.match(home, /listeningReplayAvailable\(save\)/);
   assert.match(home, /data-action="enter-listening-home"/);
-  assert.match(mission, /mission\.id === "story-11" && \(active \|\| listeningReplay\)/);
+  assert.match(mission, /mission\.id === "story-11" && \(\(active && !onLaunchChapterEleven\) \|\| listeningReplay\)/);
   assert.match(mission, /data-action="launch-listening"/);
   assert.match(css, /@media \(max-width: 820px\)[\s\S]*\.listening-screen/);
   assert.equal(listeningLeaveRisk({ phase: LISTENING_PHASES.LISTENING }, false), "active");
   assert.equal(listeningLeaveRisk({ phase: LISTENING_PHASES.COMPLETED }, false), "unsaved");
   assert.equal(listeningLeaveRisk({ phase: LISTENING_PHASES.COMPLETED }, true), "none");
   assert.equal(listeningLeaveRisk({ phase: LISTENING_PHASES.FAILED }, false), "none");
+});
+
+test("listening and contest replay use a wrapping normal-flow group", () => {
+ const css=read("src/pixel-theme.css"),home=read("src/screens/HomeScreen.jsx");
+ assert.match(home,/home-contest-listening-actions[\s\S]*home-listening-button[\s\S]*home-contest-button/);
+ assert.match(css,/\.home-contest-listening-actions \{[^}]*flex-direction: column;[^}]*gap: 8px;/);
+ assert.match(css,/\.home-contest-listening-actions > button \{ position: static;/);
 });

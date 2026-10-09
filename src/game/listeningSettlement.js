@@ -127,9 +127,11 @@ export function settleListeningRun(save, runValue, settledAtValue) {
   const chapter = normalizeListeningState(continuation.chapter11);
   if (chapter.settledRunIds.includes(run.runId)) return zeroResult(save, "ALREADY_SETTLED");
   const activeMission = activeListeningMission(save);
+  const claimed = ownArrayTail(own(own(save,"missionState"),"claimedMissionIds"),64);
+  const replay = chapter.taskTreeUnlocked && claimed?.includes("story-11");
   if (
-    !activeMission
-    || Date.parse(own(activeMission, "acceptedAt")) > Date.parse(run.startedAt)
+    (!activeMission && !replay)
+    || (activeMission && Date.parse(own(activeMission, "acceptedAt")) > Date.parse(run.startedAt))
     || !chapter.activeRun
     || chapter.activeRun.runId !== run.runId
     || !same(chapter.activeRun, run)

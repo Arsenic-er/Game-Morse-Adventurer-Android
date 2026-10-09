@@ -235,7 +235,7 @@ export function submitListeningCall(run, text, semantic, at) {
   if (error) return appendError(run, error);
   const submittedAt = normalizeIso(at);
   if (!submittedAt || Date.parse(submittedAt) < Date.parse(run.startedAt)) return run;
-  return deepFreeze({ ...run, callCount: run.callCount + 1, phase: LISTENING_PHASES.WAITING, lastCallAt: submittedAt });
+  return deepFreeze({ ...run, callCount: run.callCount + 1, phase: LISTENING_PHASES.WAITING, lastCallAt: submittedAt, lastWaitCompletedAt: null });
 }
 
 export function finishListeningWait(run, at) {
@@ -307,8 +307,8 @@ function normalizeSummary(value, run) {
     || own(value, "personId") !== TARGET_PERSON_ID
     || !observationIds
     || observationIds.length !== LISTENING_WINDOWS.length
-    || callCount === null
-    || activeMilliseconds === null
+    || callCount === null || callCount !== run.callCount
+    || activeMilliseconds === null || activeMilliseconds !== run.activeMilliseconds
     || own(value, "conclusionKey") !== CONCLUSION_KEY
     || !completedAt
     || completedAt !== run.completedAt
@@ -364,6 +364,8 @@ export function normalizeListeningRun(value) {
     || (phase === LISTENING_PHASES.WAITING && (!lastCallAt || callCount < 1))
     || (phase === LISTENING_PHASES.DECISION && (!lastWaitCompletedAt || callCount < 1))
     || (phase === LISTENING_PHASES.COMPLETED && (!completedAt || failureReason !== null))
+    || (TERMINAL_PHASES.has(phase) !== Boolean(completedAt))
+    || (phase === LISTENING_PHASES.COMPLETED && (!lastWaitCompletedAt || Date.parse(completedAt) < Date.parse(lastWaitCompletedAt)))
     || (phase === LISTENING_PHASES.FAILED && !failureReason)
     || (phase === LISTENING_PHASES.ABANDONED && !completedAt)
     || Date.parse(completedAt ?? startedAt) < Date.parse(startedAt)

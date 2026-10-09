@@ -1950,7 +1950,7 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
 }
 
 /* Chapter 11: fictional listening record */
-.home-listening-button { position: absolute; right: 18px; bottom: 316px; z-index: 4; display: flex; align-items: center; gap: 7px; }
+.home-listening-button { position: absolute; right: 18px; bottom: 356px; z-index: 4; display: flex; align-items: center; gap: 7px; }
 .listening-screen { min-height: 100vh; overflow: auto; color: #e9f7f3; background: radial-gradient(circle at 50% 10%, #173a3b 0, #08191c 46%, #03090b 100%); }
 .listening-topbar { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 18px; min-height: 72px; padding: 10px 20px; border-bottom: 4px solid #377e78; background: #071619e8; }.listening-topbar > div { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; }.listening-topbar svg { grid-row: span 2; color: #7de0cf; }.listening-topbar span { color: #75aaa4; font-size: 11px; letter-spacing: 1px; }.listening-topbar h1 { margin: 0; color: #d8fff7; font-size: 21px; }.listening-topbar > b { color: #ffe19a; }
 .listening-simulation { display: flex; align-items: center; justify-content: center; gap: 9px; width: min(1040px, calc(100% - 30px)); margin: 18px auto 0; padding: 9px 14px; border: 3px solid #a28743; color: #ffefc1; background: #30260d; }.listening-paused { position: fixed; z-index: 6; top: 78px; left: 50%; translate: -50%; padding: 8px 15px; border: 3px solid #d4aa52; background: #34270d; color: #fff0bc; }
@@ -2289,3 +2289,19 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .contest-exchange code, .contest-run-cq code, .contest-keyer strong { overflow-wrap: anywhere; }
   .contest-keyer > div, .contest-mode-select > div, .contest-briefing > div { display: flex; flex-wrap: wrap; gap: 8px; }
 }
+
+/* Chapter eleven: localized labels and long station IDs must wrap at narrow widths. */
+.listening-topbar { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.listening-topbar > div, .listening-layout > *, .listening-console section, .listening-windows article { min-width: 0; }
+.listening-topbar h1, .listening-screen button, .listening-windows article, .listening-keyer > strong { overflow-wrap: anywhere; }
+.listening-screen button { white-space: normal; max-width: 100%; }
+@media (max-width: 820px) {
+  .listening-topbar { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 12px; }
+  .listening-topbar > button { justify-self: start; }
+  .listening-console { padding: 12px; }
+}
+
+/* Replay labels can wrap: position the pair as a group, never with fixed per-button offsets. */
+.home-contest-listening-actions { position: absolute; z-index: 5; right: 22px; bottom: 308px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: calc(100% - 44px); }
+.home-contest-listening-actions > button { position: static; max-width: 100%; }
+@media (max-width: 820px) { .home-contest-listening-actions { right: 12px; max-width: calc(100% - 24px); } }
