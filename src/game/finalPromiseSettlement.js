@@ -82,7 +82,9 @@ export function settleFinalPromiseRun(save, runValue, settledAtValue) {
   const chapter = normalizeFinalPromiseState(continuation.chapter14);
   if (chapter.settledRunIds.includes(run.runId)) return zero(save, "ALREADY_SETTLED");
   const mission = activeMission(save);
-  if (!mission || Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt)
+  const claimed = arrayTail(own(own(save,"missionState"),"claimedMissionIds"),100);
+  const replay = chapter.taskTreeUnlocked && claimed?.includes("story-14");
+  if ((!mission && !replay) || (mission && Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt))
     || !chapter.activeRun || chapter.activeRun.runId !== run.runId || !same(chapter.activeRun, run)
     || String(own(save, "callsign") ?? "").trim().toUpperCase() !== run.playerCallsign) return zero(save, "RUN_STATE_MISMATCH");
   if (run.sourceQslId !== null && !linkedQsl(save, run)) return zero(save, "SOURCE_QSL_MISSING");
@@ -136,7 +138,7 @@ export function verifiedFinalPromiseCompletion(save, active) {
     const relationships = normalizeOperatorRelationships(own(save, "operatorRelationships"));
     const qslRecords = normalizeQslRecords(own(save, "qslRecords"));
     for (const record of chapter.archive) {
-      if (baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt) || !chapter.settledRunIds.includes(record.runId)) continue;
+      if (record.playerCallsign !== own(save,"callsign") || baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt) || !chapter.settledRunIds.includes(record.runId)) continue;
       const summary = chapter.completedRuns.find(({ runId }) => runId === record.runId);
       const proof = chapter.settlementProofs.find(({ runId }) => runId === record.runId);
       if (!summary || !proof || proof.recordId !== record.id || proof.qsoId !== record.qsoId
@@ -146,7 +148,7 @@ export function verifiedFinalPromiseCompletion(save, active) {
         || summary.sourceQslChoice !== record.sourceQslChoice || proof.sourceQslId !== record.sourceQslId
         || proof.sourceQslChoice !== record.sourceQslChoice || proof.tone !== record.tone
         || proof.messageKey !== record.messageKey || summary.tone !== record.tone
-        || summary.messageKey !== record.messageKey || !same(summary.recallKeys, record.recallKeys)
+        || summary.messageKey !== record.messageKey || summary.accountKey !== record.accountKey || !same(summary.recallKeys, record.recallKeys)
         || !same(summary.scheduledPersonIds, record.scheduledPersonIds)) continue;
       if (record.sourceQslId !== null && !qslRecords.some((qsl) => qsl.id === record.sourceQslId
         && qsl.personId === "person:sora" && qsl.stationId === "station:sim6jp" && qsl.callsign === "SIM6JP")) continue;

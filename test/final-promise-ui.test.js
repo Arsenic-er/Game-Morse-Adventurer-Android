@@ -46,7 +46,7 @@ test("mission launch, Home replay, final-page archive, leave guard, and responsi
   assert.match(app, /screen === "final-promise"/);
   assert.match(home, /finalPromiseReplayAvailable\(save\)/);
   assert.match(home, /data-action="enter-final-promise-home"/);
-  assert.match(mission, /mission\.id === "story-14" && \(active \|\| finalPromiseReplay\)/);
+  assert.match(mission, /mission\.id === "story-14" && \(\(active && !onLaunchChapterFourteen\) \|\| finalPromiseReplay\)/);
   assert.match(mission, /data-action="launch-final-promise"/);
   assert.match(people, /data-final-page-run-id/);
   assert.match(people, /chapter14\.archive/);

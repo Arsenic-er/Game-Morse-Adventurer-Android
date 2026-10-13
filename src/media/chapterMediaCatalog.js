@@ -26,6 +26,7 @@ const SCREEN_CHAPTERS = Object.freeze({
   "chapter-eleven": 11,
   "chapter-twelve": 12,
   "chapter-thirteen": 13,
+  "chapter-fourteen": 14,
   lights: 5,
   expedition: 6,
   "qsl-story": 7,

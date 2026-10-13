@@ -2329,3 +2329,14 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .night-operations-topbar > div { flex: 1 1 180px; }
   .night-operations-layout { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Chapter fourteen: narrow keyer, long record IDs and replay menu. */
+.final-promise-topbar, .final-promise-topbar > div, .final-promise-action > div, .final-promise-keyer > div { flex-wrap: wrap; min-width: 0; }
+.final-promise-screen :is(h1,h2,p,code,dd,li,button,strong) { overflow-wrap: anywhere; }
+.final-promise-topbar > div { flex: 1 1 380px; }
+.final-promise-topbar > div h1 { flex-basis: 100%; }
+.final-promise-screen button { max-width: 100%; white-space: normal; }
+.final-promise-page dl { grid-template-columns: minmax(0,1fr) minmax(0,2fr); }
+.final-promise-result button + button { margin: 8px; }
+.chapter-fourteen-story-screen .chapter-one-logbook { overflow-wrap: anywhere; }
+.home-final-promise-button { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border: 3px solid #d7b968; background: #1b1923; color: #ffe4a0; box-shadow: 4px 4px 0 #000; font-weight: 900; }
