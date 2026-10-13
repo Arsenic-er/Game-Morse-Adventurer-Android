@@ -187,6 +187,7 @@ function genericTraffic({ message, selfCallsign, peerCallsign, pendingQuestion }
   if (tokens.includes("TNX") || tokens.includes("TKS")) acts.THANKS = 1;
   if (tokens.includes("73") || tokens.includes("SK")) acts.SIGNOFF = 1;
   if (tokens.includes("AGN") || normalized.includes("?")) acts.ASK = 1;
+  if (tokens.includes("QRS")) acts.SPEED_REQUEST = 1;
 
   for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
     if (keywords.some((keyword) => tokens.includes(keyword))) topics[topic] = 1;

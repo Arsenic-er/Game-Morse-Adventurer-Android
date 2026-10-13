@@ -2301,7 +2301,20 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .listening-console { padding: 12px; }
 }
 
-/* Replay labels can wrap: position the pair as a group, never with fixed per-button offsets. */
+/* Replay labels can wrap: position the entries as a group, never with fixed per-button offsets. */
 .home-contest-listening-actions { position: absolute; z-index: 5; right: 22px; bottom: 308px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: calc(100% - 44px); }
 .home-contest-listening-actions > button { position: static; max-width: 100%; }
 @media (max-width: 820px) { .home-contest-listening-actions { right: 12px; max-width: calc(100% - 24px); } }
+
+/* Chapter twelve: wrap packet fields and translated controls at mobile widths. */
+.home-storm-relay-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #d49b45; background: #101a29ee; color: #ffe4a8; white-space: normal; overflow-wrap: anywhere; }
+.storm-relay-topbar > div, .storm-relay-layout > *, .storm-packet-board, .storm-packet-board article, .storm-relay-keyer { min-width: 0; }
+.storm-relay-screen button, .storm-relay-topbar h1 { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+@media (max-width: 820px) {
+  .storm-relay-layout { grid-template-columns: minmax(0, 1fr); }
+  .storm-relay-topbar > div { flex: 1 1 180px; }
+  .storm-relay-stations { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .storm-relay-stations article { min-width: 0; overflow-wrap: anywhere; }
+}
+
+.storm-relay-layout { overflow-wrap: anywhere; }

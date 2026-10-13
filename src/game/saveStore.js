@@ -1,4 +1,5 @@
 import {normalizeChapterElevenPresentation} from "./chapterElevenStory.js";
+import {normalizeChapterTwelvePresentation} from "./chapterTwelveStory.js";
 import {normalizeChapterTenPresentation} from "./chapterTenStory.js";
 import { normalizeChapterNinePresentation } from "./chapterNineStory.js";
 import { normalizeChapterEightPresentation } from "./chapterEightStory.js";
@@ -121,6 +122,7 @@ export function createSave({
     chapterNinePresentation: normalizeChapterNinePresentation(null),
     chapterTenPresentation: normalizeChapterTenPresentation(null),
     chapterElevenPresentation: normalizeChapterElevenPresentation(null),
+    chapterTwelvePresentation: normalizeChapterTwelvePresentation(null),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: emptyWorldCalendarState(),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,
@@ -235,6 +237,7 @@ export function normalizeSave(save) {
     chapterNinePresentation: normalizeChapterNinePresentation(Object.getOwnPropertyDescriptor(save, "chapterNinePresentation")?.value),
     chapterTenPresentation: normalizeChapterTenPresentation(Object.getOwnPropertyDescriptor(save, "chapterTenPresentation")?.value),
     chapterElevenPresentation: normalizeChapterElevenPresentation(Object.getOwnPropertyDescriptor(save, "chapterElevenPresentation")?.value),
+    chapterTwelvePresentation: normalizeChapterTwelvePresentation(Object.getOwnPropertyDescriptor(save, "chapterTwelvePresentation")?.value),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: normalizeWorldCalendarState(save?.worldCalendarState),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,
