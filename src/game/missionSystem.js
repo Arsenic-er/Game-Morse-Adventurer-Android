@@ -19,7 +19,7 @@ import { verifiedNightOperationsCompletion } from "./nightOperationsCompletion.j
 import { normalizeFinalPromiseState } from "./finalPromiseRun.js";
 import { verifiedFinalPromiseCompletion } from "./finalPromiseSettlement.js";
 import { normalizeFirstPageState } from "./firstPageState.js";
-import { verifiedFirstPageCompletion } from "./firstPageSettlement.js";
+import { verifiedFirstPageCompletion, verifiedFirstPageRecord } from "./firstPageSettlement.js";
 import { normalizeOpenStationState } from "./openStationState.js";
 import { normalizeStoryContinuationState } from "./storyContinuationState.js";
 import { normalizeOperatorRelationships } from "../qso/operatorRelationships.js";
@@ -914,7 +914,7 @@ export function claimMission(save, missionId, claimedAt = new Date().toISOString
   if (definition.id === "story-15") {
     const current = normalizeStoryContinuationState(save?.storyContinuationState);
     const chapter15 = normalizeFirstPageState(current.chapter15);
-    const goal = chapter15.archive.at(-1)?.goal ?? null;
+    const goal = verifiedFirstPageRecord(save, state.activeMissions.find(mission => mission.id === "story-15"))?.goal ?? null;
     continuation = normalizeStoryContinuationState({
       ...current,
       chapter15: normalizeFirstPageState({ ...chapter15, taskTreeUnlocked: true }),

@@ -3,7 +3,7 @@ import { ArrowLeft, BookOpenText, Eye, GearSix, X } from "@phosphor-icons/react"
 import { visualNovelText } from "../screens/visualNovelText.js";
 import { ChapterSceneEventContext } from "../media/chapterSceneEventContext.js";
 
-function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHistory, onHide, onNotes, hasNotes, primaryAction }) {
+function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHistory, onHide, onNotes, hasNotes, primaryAction, primaryDisabled }) {
   const [line, setLine] = useState(0);
   const [visible, setVisible] = useState(0);
   const [auto, setAuto] = useState(false);
@@ -46,8 +46,8 @@ function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHisto
     requestAnimationFrame(() => { actionLock.current = false; });
     if (!complete) return setVisible(characters.length);
     if (!lastLine) { setLine(value => Math.min(beat.paragraphs.length - 1, value + 1)); setVisible(0); return; }
-    onPrimary();
-  }, [paused, complete, characters.length, lastLine, beat.paragraphs.length, onPrimary]);
+    if (!primaryDisabled) onPrimary();
+  }, [paused, complete, characters.length, lastLine, beat.paragraphs.length, onPrimary, primaryDisabled]);
 
   useEffect(() => {
     const onKey = event => {
@@ -75,7 +75,7 @@ function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHisto
         {hasNotes && <button data-action="vn-notes" onClick={onNotes}>{t.notes}</button>}
         <button data-action="vn-hide" onClick={onHide}>{t.hide}</button>
       </div>
-      <button className="vn-primary" data-action={primaryAction} onClick={next} disabled={paused}>
+      <button className="vn-primary" data-action={primaryAction} onClick={next} disabled={paused || (ready && primaryDisabled)}>
         {ready ? primaryLabel : t.next}<span aria-hidden="true">▸</span>
       </button>
     </div>
@@ -83,7 +83,7 @@ function NovelDialog({ beat, t, paused, primaryLabel, onPrimary, onRead, onHisto
   </section>;
 }
 
-export function VisualNovelStage({ language, beat, artwork, background, artLabel, chapter, title, mode, safety, backLabel, settingsLabel, artViewLabel, onBack, onSettings, primaryLabel, onPrimary, inputBlocked = false, busy = false, children, context, toolbar, overlay, sceneLayers = [], className = "", primaryAction = "chapter-one-primary", ...data }) {
+export function VisualNovelStage({ language, beat, artwork, background, artLabel, chapter, title, mode, safety, backLabel, settingsLabel, artViewLabel, onBack, onSettings, primaryLabel, onPrimary, inputBlocked = false, busy = false, children, context, toolbar, overlay, sceneLayers = [], className = "", primaryAction = "chapter-one-primary", primaryDisabled = false, ...data }) {
   const t = visualNovelText(language);
   const sceneEventPulse = useContext(ChapterSceneEventContext);
   const [modal, setModal] = useState(null);
@@ -152,7 +152,7 @@ export function VisualNovelStage({ language, beat, artwork, background, artLabel
       <div className="vn-scene-heading" key={beat.id}><span>{context ?? beat.eyebrow}</span><h1>{beat.title}</h1></div>
       {overlay}
       <NovelDialog key={`${language}:${beat.id}`} beat={beat} t={t} paused={inputBlocked || busy || !!modal || hidden || !active}
-        primaryLabel={primaryLabel} onPrimary={onPrimary} onRead={onRead} hasNotes={!!children} primaryAction={primaryAction}
+        primaryLabel={primaryLabel} onPrimary={onPrimary} onRead={onRead} hasNotes={!!children} primaryAction={primaryAction} primaryDisabled={primaryDisabled}
         onHistory={event => open("history", event)} onNotes={event => open("notes", event)} onHide={() => setHidden(true)} />
     </div>
     {hidden && <button ref={restoreRef} className="vn-restore" onClick={showUI}><Eye size={18} />{t.restore}</button>}

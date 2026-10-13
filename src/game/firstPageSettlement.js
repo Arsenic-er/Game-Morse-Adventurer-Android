@@ -72,7 +72,7 @@ function ordinaryQso(save, active, qsoId) {
   const raw = rawLogs.find((entry) => own(entry, "id") === qsoId);
   const log = normalizeQsoLogEntry(raw);
   const acceptedAt = iso(own(active, "acceptedAt"));
-  if (!log || !acceptedAt || Date.parse(log.completedAt) < Date.parse(acceptedAt)
+  if (!log || log.playerCallsign !== own(save, "callsign") || !acceptedAt || Date.parse(log.completedAt) < Date.parse(acceptedAt)
     || log.eventId !== null || log.eventRunId !== null || log.eventKind !== null
     || !Number.isSafeInteger(log.credits) || log.credits <= 0
     || !settledLedgerContains(save, qsoId)) return null;
@@ -81,13 +81,14 @@ function ordinaryQso(save, active, qsoId) {
     && stationIdentityForCallsign(log.callsign, claim)?.stationId === log.stationId ? log : null;
 }
 
-export function firstPageCandidate(save) {
+export function firstPageCandidate(save, preferredQsoId = null) {
   const active = activeMission(save); if (!active) return null;
-  const chapter = normalizeFirstPageState(own(own(save, "storyContinuationState"), "chapter15"));
-  if (chapter.settledRunIds.length) return null;
+  if (verifiedFirstPageRecord(save, active)) return null;
   const logs = ownTail(own(save, "qsoLogs"), 200); if (!logs) return null;
   for (const raw of logs) {
-    const id = own(raw, "id"); const log = ordinaryQso(save, active, id);
+    const id = own(raw, "id");
+    if (preferredQsoId !== null && id !== preferredQsoId) continue;
+    const log = ordinaryQso(save, active, id);
     if (log) return Object.freeze({ qsoId: log.id, callsign: log.callsign, personId: log.personId,
       stationId: log.stationId, location: log.location, completedAt: log.completedAt, credits: log.credits });
   }
@@ -102,6 +103,7 @@ export function settleFirstPage(save, input) {
   if (!goal) return zero(save, "INVALID_GOAL");
   if (!completedAt) return zero(save, "INVALID_COMPLETION_TIME");
   const active = activeMission(save); if (!active) return zero(save, "MISSION_NOT_ACTIVE");
+  if (verifiedFirstPageRecord(save, active)) return zero(save, "ALREADY_SETTLED");
   const qso = ordinaryQso(save, active, qsoId); if (!qso) return zero(save, "QSO_NOT_ELIGIBLE");
   if (Date.parse(completedAt) < Date.parse(qso.completedAt)) return zero(save, "INVALID_COMPLETION_TIME");
   const runId = `first-page:${qso.id}`;
@@ -127,11 +129,11 @@ export function settleFirstPage(save, input) {
     runId, moneyAwarded: 0, technologyPointsAwarded: 0 };
 }
 
-export function verifiedFirstPageCompletion(save, active) {
+export function verifiedFirstPageRecord(save, active) {
   try {
-    if (own(active, "id") !== "story-15" || own(own(active, "contract"), "missionPhase") !== "ordinary-first-page") return false;
-    const acceptedAt = iso(own(active, "acceptedAt")); if (!acceptedAt) return false;
-    const baseline = ownStringList(own(active, "baselineQsoIds"), 200, 96); if (!baseline) return false;
+    if (own(active, "id") !== "story-15" || own(own(active, "contract"), "missionPhase") !== "ordinary-first-page") return null;
+    const acceptedAt = iso(own(active, "acceptedAt")); if (!acceptedAt) return null;
+    const baseline = ownStringList(own(active, "baselineQsoIds"), 200, 96); if (!baseline) return null;
     const chapter = normalizeFirstPageState(own(own(save, "storyContinuationState"), "chapter15"));
     for (const record of chapter.archive) {
       if (baseline.includes(record.qsoId) || Date.parse(record.qsoCompletedAt) < Date.parse(acceptedAt)
@@ -145,8 +147,10 @@ export function verifiedFirstPageCompletion(save, active) {
         && proof.acceptedAt === acceptedAt && proof.qsoCompletedAt === record.qsoCompletedAt
         && qso.completedAt === record.qsoCompletedAt && qso.callsign === record.callsign
         && qso.personId === record.personId && qso.stationId === record.stationId
-        && qso.location === record.location) return true;
+        && qso.location === record.location) return record;
     }
-    return false;
-  } catch { return false; }
+    return null;
+  } catch { return null; }
 }
+
+export function verifiedFirstPageCompletion(save, active) { return Boolean(verifiedFirstPageRecord(save, active)); }

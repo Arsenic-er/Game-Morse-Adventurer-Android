@@ -1,3 +1,4 @@
+import {advanceChapterFifteenPresentation,chooseChapterFifteenGoal,sealChapterFifteenPresentation,chapterFifteenStoryModel,canContinueChapterFifteen} from "./game/chapterFifteenStory.js";
 import {advanceChapterFourteenPresentation,chapterFourteenStoryModel} from "./game/chapterFourteenStory.js";
 import {advanceChapterThirteenPresentation,chapterThirteenStoryModel} from "./game/chapterThirteenStory.js";
 import {advanceChapterTwelvePresentation,chapterTwelveStoryModel} from "./game/chapterTwelveStory.js";
@@ -131,6 +132,7 @@ const ChapterTwelveStoryScreen = lazy(() => import("./screens/ChapterTwelveStory
   .then(({ ChapterTwelveStoryScreen: component }) => ({ default: component })));
 const ChapterThirteenStoryScreen = lazy(() => import("./screens/ChapterThirteenStoryScreen.jsx")
   .then(({ ChapterThirteenStoryScreen: component }) => ({ default: component })));
+const ChapterFifteenStoryScreen = lazy(() => import("./screens/ChapterFifteenStoryScreen.jsx").then(({ChapterFifteenStoryScreen: component}) => ({default:component})));
 const ChapterFourteenStoryScreen = lazy(() => import("./screens/ChapterFourteenStoryScreen.jsx")
   .then(({ ChapterFourteenStoryScreen: component }) => ({ default: component })));
 const ChapterElevenStoryScreen = lazy(() => import("./screens/ChapterElevenStoryScreen.jsx")
@@ -1175,12 +1177,13 @@ function StationScreen({ language, keyType, save, onActivityRisk, onSaveUpdate, 
     settledEntry: pendingSettlement.settledEntry,
   } : null);
   const displayedResultEntry = resultMeta?.settledEntry ?? resultEntry;
+  const fifteenthStoryModel = saved ? chapterFifteenStoryModel(save) : null;
   const fourthStoryModel = saved ? chapterFourStoryModel(save) : null;
   const thirdStoryModel = saved && !fourthStoryModel?.playable ? chapterThreeStoryModel(save) : null;
   const secondStoryModel = saved && !fourthStoryModel?.playable && !thirdStoryModel?.playable ? chapterTwoStoryModel(save) : null;
-  const storyChapter = fourthStoryModel?.playable ? 4 : thirdStoryModel?.playable ? 3 : secondStoryModel?.playable ? 2 : 1;
-  const storyModel = saved ? (storyChapter === 4 ? fourthStoryModel : storyChapter === 3 ? thirdStoryModel : storyChapter === 2 ? secondStoryModel : chapterOneStoryModel(save)) : null;
-  const storyHasResult = storyChapter === 3 ? storyModel?.matchingQsoIds.includes(displayedResultEntry?.id) : storyModel?.candidate?.id === displayedResultEntry?.id;
+  const storyChapter = fifteenthStoryModel?.playable ? 15 : fourthStoryModel?.playable ? 4 : thirdStoryModel?.playable ? 3 : secondStoryModel?.playable ? 2 : 1;
+  const storyModel = saved ? (storyChapter === 15 ? fifteenthStoryModel : storyChapter === 4 ? fourthStoryModel : storyChapter === 3 ? thirdStoryModel : storyChapter === 2 ? secondStoryModel : chapterOneStoryModel(save)) : null;
+  const storyHasResult = storyChapter === 15 ? canContinueChapterFifteen(save, displayedResultEntry?.id) : storyChapter === 3 ? storyModel?.matchingQsoIds.includes(displayedResultEntry?.id) : storyModel?.candidate?.id === displayedResultEntry?.id;
   const continueStory = storyModel?.playable && storyHasResult && onContinueStory ? () => onContinueStory(storyChapter) : null;
   const liveContactRevealed = qso.contactRevealed === true;
   const blindContact = !selectedLog && qso.hasContact && !liveContactRevealed;
@@ -1863,7 +1866,7 @@ export function App() {
     setAutomaticKeyWpm(nextWpm);
     setQsoGuidance(normalizeQsoGuidance(next.qsoGuidance));
     setMediaSettings(normalizeChapterMediaSettings(next.mediaSettings));
-    if (activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen)) {
+    if (activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "chapter-fifteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen)) {
       updateActiveSave({ keyType: next.keyType, automaticKeyWpm: nextWpm, qsoGuidance: normalizeQsoGuidance(next.qsoGuidance) });
     }
   }
@@ -2177,6 +2180,55 @@ export function App() {
     setScreen("coordinate-relay");
   }
 
+  function enterChapterFifteen() {
+    const current = savesRef.current.find((item) => item.id === activeSaveId);
+    if (!current) return;
+    const model = chapterFifteenStoryModel(current);
+    if (model.status === "available") {
+      const accepted = acceptMissionForActiveSave("story-15");
+      if (!accepted?.accepted) return;
+    } else if (!model.playable) return;
+    setScreen("chapter-fifteen");
+  }
+
+  function advanceChapterFifteen(beat) {
+    commitSaves((current) => current.map((save) => {
+      if (save.id !== activeSaveId) return save;
+      const result = advanceChapterFifteenPresentation(save, beat);
+      return result.updated ? { ...result.save, updatedAt: new Date().toISOString() } : save;
+    }));
+  }
+
+  function claimChapterFifteen() {
+    const current = savesRef.current.find((item) => item.id === activeSaveId);
+    const model = chapterFifteenStoryModel(current);
+    if (model.status !== "ready" || model.step !== 4 || !model.record) return;
+    // Old saves may have sealed the page before presentation bookmarks existed.
+    advanceChapterFifteen("log");
+    claimMissionForActiveSave("story-15");
+  }
+
+  function startChapterFifteenActivity() {
+    const current = savesRef.current.find((item) => item.id === activeSaveId);
+    const model = chapterFifteenStoryModel(current);
+    if (!model.playable || model.step !== 2 || model.record || model.candidate) return;
+    setScreen("station");
+  }
+
+  function chooseChapterFifteen(goal) {
+    commitSaves(current => current.map(save => save.id === activeSaveId ? chooseChapterFifteenGoal(save, goal).save : save));
+  }
+
+  async function sealChapterFifteen() {
+    let transaction = null;
+    commitSaves(current => current.map(save => {
+      if (save.id !== activeSaveId) return save;
+      transaction = sealChapterFifteenPresentation(save, new Date().toISOString());
+      return transaction.settled ? {...transaction.save, updatedAt:new Date().toISOString()} : save;
+    }));
+    return transaction;
+  }
+
   function enterChapterFourteen() {
     const current = savesRef.current.find((item) => item.id === activeSaveId);
     if (!current) return;
@@ -2398,7 +2450,7 @@ export function App() {
 
   function enterHomeStation() {
     const current = savesRef.current.find((item) => item.id === activeSaveId);
-    setScreen(chapterOneStoryModel(current).playable ? "chapter-one" : chapterTwoStoryModel(current).playable ? "chapter-two" : chapterThreeStoryModel(current).playable ? "chapter-three" : chapterFourStoryModel(current).playable ? "chapter-four" : chapterFiveStoryModel(current).playable ? "chapter-five" : chapterSixStoryModel(current).playable ? "chapter-six" : chapterSevenStoryModel(current).playable ? "chapter-seven" : chapterEightStoryModel(current).playable ? "chapter-eight" : chapterNineStoryModel(current).playable ? "chapter-nine" : chapterTenStoryModel(current).playable ? "chapter-ten" : chapterElevenStoryModel(current).playable ? "chapter-eleven" : chapterTwelveStoryModel(current).playable ? "chapter-twelve" : chapterThirteenStoryModel(current).playable ? "chapter-thirteen" : chapterFourteenStoryModel(current).playable ? "chapter-fourteen" : "station");
+    setScreen(chapterOneStoryModel(current).playable ? "chapter-one" : chapterTwoStoryModel(current).playable ? "chapter-two" : chapterThreeStoryModel(current).playable ? "chapter-three" : chapterFourStoryModel(current).playable ? "chapter-four" : chapterFiveStoryModel(current).playable ? "chapter-five" : chapterSixStoryModel(current).playable ? "chapter-six" : chapterSevenStoryModel(current).playable ? "chapter-seven" : chapterEightStoryModel(current).playable ? "chapter-eight" : chapterNineStoryModel(current).playable ? "chapter-nine" : chapterTenStoryModel(current).playable ? "chapter-ten" : chapterElevenStoryModel(current).playable ? "chapter-eleven" : chapterTwelveStoryModel(current).playable ? "chapter-twelve" : chapterThirteenStoryModel(current).playable ? "chapter-thirteen" : chapterFourteenStoryModel(current).playable ? "chapter-fourteen" : chapterFifteenStoryModel(current).playable ? "chapter-fifteen" : "station");
   }
 
   let currentScreen;
@@ -2458,6 +2510,12 @@ export function App() {
     onAdvance={advanceChapterEleven} onEnterActivity={startChapterElevenActivity} onClaim={claimChapterEleven}
     onBack={() => setScreen("home")} onSettings={() => setSettingsOpen(true)}
   />;
+  else if (screen === "chapter-fifteen" && activeSave) currentScreen = <ChapterFifteenStoryScreen
+    key={activeSave.id} language={language} save={activeSave} inputBlocked={settingsOpen}
+    onAdvance={advanceChapterFifteen} onChooseGoal={chooseChapterFifteen} onSeal={sealChapterFifteen}
+    onEnterActivity={startChapterFifteenActivity} onClaim={claimChapterFifteen}
+    onBack={() => setScreen("home")} onSettings={() => setSettingsOpen(true)}
+  />;
   else if (screen === "chapter-fourteen" && activeSave) currentScreen = <ChapterFourteenStoryScreen
     key={activeSave.id} language={language} save={activeSave} inputBlocked={settingsOpen}
     onAdvance={advanceChapterFourteen} onEnterActivity={startChapterFourteenActivity} onClaim={claimChapterFourteen}
@@ -2475,7 +2533,7 @@ export function App() {
   />;
   else if (screen === "start") currentScreen = <StartScreen language={language} setLanguage={setLanguage} onStart={() => setScreen("saves")} onPractice={() => enterPractice("start")} onSettings={() => setSettingsOpen(true)} onManual={() => setManualOpen(true)} />;
   else if (screen === "saves") currentScreen = <SaveSelectScreen language={language} saves={saves} activeSaveId={activeSaveId} defaultKeyType={keyType} defaultAutomaticKeyWpm={automaticKeyWpm} defaultQsoGuidance={qsoGuidance} onLoad={selectSave} onCreate={createAndSelect} onDelete={deleteSave} onBack={() => setScreen("start")} />;
-  else if (screen === "home" && activeSave) currentScreen = <HomeScreen language={language} save={activeSave} onPurchase={purchaseForActiveSave} onEquipItem={equipForActiveSave} onUnlockTechnology={unlockTechnologyForActiveSave} onAcceptMission={acceptMissionForActiveSave} onClaimMission={claimMissionForActiveSave} onAbandonMission={abandonMissionForActiveSave} onEnterChapterOne={enterChapterOne} onEnterChapterTwo={enterChapterTwo} onEnterChapterThree={enterChapterThree} onEnterChapterFour={enterChapterFour} onEnterChapterFive={enterChapterFive} onEnterChapterSix={enterChapterSix} onEnterChapterSeven={enterChapterSeven} onEnterChapterEight={enterChapterEight} onEnterChapterNine={enterChapterNine} onEnterChapterTen={enterChapterTen} onEnterChapterEleven={enterChapterEleven} onEnterChapterTwelve={enterChapterTwelve} onEnterChapterThirteen={enterChapterThirteen} onEnterChapterFourteen={enterChapterFourteen} onEnterLights={enterLights} onEnterExpedition={enterExpedition} onEnterQslStory={enterQslStory} onEnterServiceNet={enterServiceNet} onEnterCoordinateRelay={enterCoordinateRelay} onEnterContest={enterContest} onEnterListening={enterListening} onEnterStormRelay={enterStormRelay} onEnterNightOperations={enterNightOperations} onEnterFinalPromise={enterFinalPromise} onSettleFirstPage={settleFirstPageForActiveSave} onUpdateOpenStationGoal={updateOpenStationGoalForActiveSave} onConfirmQslChoice={confirmQslChoiceForActiveSave} onEnterStation={enterHomeStation} onEnterPractice={() => enterPractice("home")} onBack={() => setScreen("saves")} onSettings={() => setSettingsOpen(true)} />;
+  else if (screen === "home" && activeSave) currentScreen = <HomeScreen language={language} save={activeSave} onPurchase={purchaseForActiveSave} onEquipItem={equipForActiveSave} onUnlockTechnology={unlockTechnologyForActiveSave} onAcceptMission={acceptMissionForActiveSave} onClaimMission={claimMissionForActiveSave} onAbandonMission={abandonMissionForActiveSave} onEnterChapterOne={enterChapterOne} onEnterChapterTwo={enterChapterTwo} onEnterChapterThree={enterChapterThree} onEnterChapterFour={enterChapterFour} onEnterChapterFive={enterChapterFive} onEnterChapterSix={enterChapterSix} onEnterChapterSeven={enterChapterSeven} onEnterChapterEight={enterChapterEight} onEnterChapterNine={enterChapterNine} onEnterChapterTen={enterChapterTen} onEnterChapterEleven={enterChapterEleven} onEnterChapterTwelve={enterChapterTwelve} onEnterChapterThirteen={enterChapterThirteen} onEnterChapterFourteen={enterChapterFourteen} onEnterChapterFifteen={enterChapterFifteen} onEnterLights={enterLights} onEnterExpedition={enterExpedition} onEnterQslStory={enterQslStory} onEnterServiceNet={enterServiceNet} onEnterCoordinateRelay={enterCoordinateRelay} onEnterContest={enterContest} onEnterListening={enterListening} onEnterStormRelay={enterStormRelay} onEnterNightOperations={enterNightOperations} onEnterFinalPromise={enterFinalPromise} onSettleFirstPage={settleFirstPageForActiveSave} onUpdateOpenStationGoal={updateOpenStationGoalForActiveSave} onConfirmQslChoice={confirmQslChoiceForActiveSave} onEnterStation={enterHomeStation} onEnterPractice={() => enterPractice("home")} onBack={() => setScreen("saves")} onSettings={() => setSettingsOpen(true)} />;
   else if (screen === "practice") {
     const persistentStats = practiceStatsByMode(activeSave?.practiceRecords);
     if (activeSave?.practiceRecords) {
@@ -2608,7 +2666,7 @@ export function App() {
     onContinueStory={enterChapterFourteen} onSettings={() => setSettingsOpen(true)}
     onBack={() => setScreen(chapterFourteenStoryModel(activeSave).playable ? "chapter-fourteen" : "home")}
   />;
-  else if (activeSave) currentScreen = <StationScreen key={activeSave.id} language={language} keyType={activeSave.keyType ?? keyType} save={activeSave} onActivityRisk={setActivityRisk} onSaveUpdate={updateActiveSave} inputBlocked={settingsOpen} reviewAssist={Boolean(localReviewBoot)} onSettings={() => setSettingsOpen(true)} onBack={() => setScreen("home")} onContinueStory={(chapter) => chapter === 4 ? enterChapterFour() : chapter === 3 ? enterChapterThree() : chapter === 2 ? enterChapterTwo() : enterChapterOne()} />;
+  else if (activeSave) currentScreen = <StationScreen key={activeSave.id} language={language} keyType={activeSave.keyType ?? keyType} save={activeSave} onActivityRisk={setActivityRisk} onSaveUpdate={updateActiveSave} inputBlocked={settingsOpen} reviewAssist={Boolean(localReviewBoot)} onSettings={() => setSettingsOpen(true)} onBack={() => setScreen("home")} onContinueStory={(chapter) => chapter === 15 ? enterChapterFifteen() : chapter === 4 ? enterChapterFour() : chapter === 3 ? enterChapterThree() : chapter === 2 ? enterChapterTwo() : enterChapterOne()} />;
   else currentScreen = <SaveSelectScreen language={language} saves={saves} activeSaveId={activeSaveId} defaultKeyType={keyType} defaultAutomaticKeyWpm={automaticKeyWpm} defaultQsoGuidance={qsoGuidance} onLoad={selectSave} onCreate={createAndSelect} onDelete={deleteSave} onBack={() => setScreen("start")} />;
   if (localReviewBoot && !["chapter-one", "chapter-one-review", "station"].includes(screen)) currentScreen = <ChapterOneLocalMenu
     language={language} save={activeSave} inputBlocked={settingsOpen}
@@ -2628,7 +2686,7 @@ export function App() {
         {currentScreen}
       </ChapterMediaStage>
     </Suspense>
-    {!localReviewBoot && !["chapter-one-review", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen"].includes(screen) && <NetworkIndicator language={language} />}
+    {!localReviewBoot && !["chapter-one-review", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "chapter-fifteen"].includes(screen) && <NetworkIndicator language={language} />}
     <Suspense fallback={null}><AchievementNotification
         language={language}
         activeAchievement={achievementQueue[0] ?? null}
@@ -2638,9 +2696,9 @@ export function App() {
     {manualOpen && <Suspense fallback={null}><StationManualModal language={language} onClose={() => setManualOpen(false)} /></Suspense>}
     {settingsOpen && <SettingsModal
       language={language}
-      keyType={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.keyType : keyType}
-      automaticKeyWpm={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.automaticKeyWpm : automaticKeyWpm}
-      qsoGuidance={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.qsoGuidance : qsoGuidance}
+      keyType={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "chapter-fifteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.keyType : keyType}
+      automaticKeyWpm={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "chapter-fifteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.automaticKeyWpm : automaticKeyWpm}
+      qsoGuidance={activeSave && ["home", "station", "chapter-one", "chapter-two", "chapter-three", "chapter-four", "chapter-five", "chapter-six", "chapter-seven", "chapter-eight", "chapter-nine", "chapter-ten", "chapter-eleven", "chapter-twelve", "chapter-thirteen", "chapter-fourteen", "chapter-fifteen", "lights", "expedition", "qsl-story", "service-net", "coordinate-relay", "contest", "listening", "storm-relay", "night-operations", "final-promise"].includes(screen) ? activeSave.qsoGuidance : qsoGuidance}
       mediaSettings={mediaSettings}
       onApply={applySettings}
       onClose={() => setSettingsOpen(false)}
