@@ -144,14 +144,14 @@ export function submitNightExchange(run, message, semantic, at) {
   if (!window || compact(message) !== `${window.callsign} DE ${run.playerCallsign} 599 ${window.band} K` || !completedAt || Date.parse(completedAt) < Date.parse(run.startedAt) + run.activeMilliseconds) return run;
   const contact = { id: `night-contact:${run.runId.slice("night-operations:".length)}:${window.order}`, runId: run.runId, windowId: window.id,
     callsign: window.callsign, npcId: window.npcId, personId: window.personId, stationId: window.stationId, band: window.band,
-    propagationGrade: window.propagationGrade, recoveryActions: run.recoveryActions, completedAt, isFictional: true };
+    propagationGrade: window.propagationGrade, recoveryActions: run.recoveryActions, activeMilliseconds: run.activeMilliseconds, completedAt, isFictional: true };
   const contacts = [...run.contacts, contact];
   if (contacts.length === 3) return deepFreeze({ ...run, contacts, currentWindowId: null, phase: NIGHT_OPERATIONS_PHASES.COMPLETED, completedAt, failureReason: null, summary: buildSummary(run, contacts, completedAt) });
   return deepFreeze({ ...run, contacts, currentWindowId: null, recoveryActions: [], phase: NIGHT_OPERATIONS_PHASES.WINDOW_CLOSED });
 }
 export function requestNightOperationsRepeat(run, message, semantic) {
   if (!run || !["CALL", "EXCHANGE"].includes(run.phase) || own(semantic, "safeToCommit") !== true) return run;
-  const action = compact(message)?.split(" ")[0]; if (!["AGN", "QRS"].includes(action) || run.recoveryActions.length >= 8) return run;
+  const normalized = compact(message); const action = normalized?.split(" ")[0]; if (!/^(AGN|QRS)(?: K)?$/u.test(normalized ?? "") || run.recoveryActions.length >= 8) return run;
   return deepFreeze({ ...run, recoveryActions: [...run.recoveryActions, action] });
 }
 export function abandonNightOperationsRun(run, at) {
@@ -177,9 +177,11 @@ function normalizeStringList(value, maximum, allowed = null) {
 function normalizeContact(value, windows, runIdValue, startedAt) {
   const window = windows.find(({ id }) => id === own(value, "windowId")); const completedAt = iso(own(value, "completedAt"));
   const recoveryActions = strictArray(own(value, "recoveryActions"), 8, (entry) => ["AGN", "QRS"].includes(entry) ? entry : null);
-  const completedAtMilliseconds = completedAt ? Date.parse(completedAt) - Date.parse(startedAt) : -1;
-  if (!window || own(value, "id") !== `night-contact:${runIdValue.slice("night-operations:".length)}:${window.order}` || own(value, "runId") !== runIdValue || own(value, "callsign") !== window.callsign || own(value, "npcId") !== window.npcId || own(value, "personId") !== window.personId || own(value, "stationId") !== window.stationId || own(value, "band") !== window.band || own(value, "propagationGrade") !== window.propagationGrade || !recoveryActions || !completedAt || completedAtMilliseconds < window.opensAtMilliseconds || completedAtMilliseconds >= window.closesAtMilliseconds || own(value, "isFictional") !== true) return null;
-  return { id: own(value, "id"), runId: runIdValue, windowId: window.id, callsign: window.callsign, npcId: window.npcId, personId: window.personId, stationId: window.stationId, band: window.band, propagationGrade: window.propagationGrade, recoveryActions, completedAt, isFictional: true };
+  const wallMilliseconds = completedAt ? Date.parse(completedAt) - Date.parse(startedAt) : -1;
+  // Legacy contacts used wall time. New contacts persist the paused activity clock separately.
+  const completedAtMilliseconds = own(value, "activeMilliseconds") === undefined ? wallMilliseconds : integer(own(value, "activeMilliseconds"), 0, RUN_TIMEOUT_MS);
+  if (!window || own(value, "id") !== `night-contact:${runIdValue.slice("night-operations:".length)}:${window.order}` || own(value, "runId") !== runIdValue || own(value, "callsign") !== window.callsign || own(value, "npcId") !== window.npcId || own(value, "personId") !== window.personId || own(value, "stationId") !== window.stationId || own(value, "band") !== window.band || own(value, "propagationGrade") !== window.propagationGrade || !recoveryActions || !completedAt || completedAtMilliseconds === null || wallMilliseconds < completedAtMilliseconds || completedAtMilliseconds < window.opensAtMilliseconds || completedAtMilliseconds >= window.closesAtMilliseconds || own(value, "isFictional") !== true) return null;
+  return { id: own(value, "id"), runId: runIdValue, windowId: window.id, callsign: window.callsign, npcId: window.npcId, personId: window.personId, stationId: window.stationId, band: window.band, propagationGrade: window.propagationGrade, recoveryActions, activeMilliseconds: completedAtMilliseconds, completedAt, isFictional: true };
 }
 export function normalizeNightOperationsSummary(value, run = null) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -189,7 +191,7 @@ export function normalizeNightOperationsSummary(value, run = null) {
   const activeMilliseconds = integer(own(value, "activeMilliseconds"), 0, RUN_TIMEOUT_MS); const missedWindowIds = normalizeStringList(own(value, "missedWindowIds"), 1); const completedAt = iso(own(value, "completedAt"));
   if (!runIdValue || !playerCallsign || contactIds?.length !== 3 || windowIds?.length !== 3 || personIds?.length !== 3 || !scheduleSeed || activeMilliseconds === null || !missedWindowIds || !completedAt || own(value, "isFictional") !== true) return null;
   const summary = { runId: runIdValue, playerCallsign, contactIds, windowIds, personIds, scheduleSeed, activeMilliseconds, missedWindowIds, completedAt, isFictional: true };
-  if (run && (runIdValue !== run.runId || playerCallsign !== run.playerCallsign || scheduleSeed !== run.seed || activeMilliseconds !== run.activeMilliseconds || completedAt !== run.completedAt || JSON.stringify(contactIds) !== JSON.stringify(run.contacts.map(({ id }) => id)) || JSON.stringify(windowIds) !== JSON.stringify(run.contacts.map(({ windowId }) => windowId)) || JSON.stringify(personIds) !== JSON.stringify(run.contacts.map(({ personId }) => personId)))) return null;
+  if (run && (runIdValue !== run.runId || playerCallsign !== run.playerCallsign || scheduleSeed !== run.seed || activeMilliseconds !== run.activeMilliseconds || completedAt !== run.completedAt || JSON.stringify(contactIds) !== JSON.stringify(run.contacts.map(({ id }) => id)) || JSON.stringify(windowIds) !== JSON.stringify(run.contacts.map(({ windowId }) => windowId)) || JSON.stringify(personIds) !== JSON.stringify(run.contacts.map(({ personId }) => personId)) || JSON.stringify(missedWindowIds) !== JSON.stringify(run.missedWindowIds))) return null;
   return deepFreeze(summary);
 }
 export function normalizeNightOperationsRun(value) {
@@ -209,13 +211,15 @@ export function normalizeNightOperationsRun(value) {
     const contacts = strictArray(own(value, "contacts"), 3, (entry) => normalizeContact(entry, windows, expectedRunId, startedAt));
     const missedWindowIds = normalizeStringList(own(value, "missedWindowIds"), 4, allowedWindowIds);
     const recoveryActions = strictArray(own(value, "recoveryActions"), 8, (entry) => ["AGN", "QRS"].includes(entry) ? entry : null);
-    if (!contacts || !missedWindowIds || !recoveryActions || new Set(contacts.map(({ personId }) => personId)).size !== contacts.length || contacts.some(({ windowId }) => missedWindowIds.includes(windowId))) return null;
+    if (!contacts || contacts.some((contact, index) => contact.activeMilliseconds > activeMilliseconds || index > 0 && (contact.activeMilliseconds <= contacts[index - 1].activeMilliseconds || contact.completedAt < contacts[index - 1].completedAt)) || !missedWindowIds || !recoveryActions || new Set(contacts.map(({ personId }) => personId)).size !== contacts.length || contacts.some(({ windowId }) => missedWindowIds.includes(windowId))) return null;
     const currentWindowId = own(value, "currentWindowId");
     if (currentWindowId !== null && (!allowedWindowIds.has(currentWindowId) || !["CALL", "EXCHANGE"].includes(phase))) return null;
+    const selected = windows.find(window => window.id === currentWindowId);
+    if (["CALL", "EXCHANGE"].includes(phase) && (!selected || activeMilliseconds < selected.opensAtMilliseconds || activeMilliseconds >= selected.closesAtMilliseconds || contacts.some(contact => contact.windowId === currentWindowId))) return null;
     const completedAt = iso(own(value, "completedAt"), true); const failureReason = own(value, "failureReason");
     if (failureReason !== null && !FAILURE_REASONS.has(failureReason)) return null;
     const partial = { version: NIGHT_OPERATIONS_RUN_VERSION, runId: expectedRunId, seed, playerCallsign, knownPersonIds, windows, contacts, missedWindowIds, currentWindowId, recoveryActions, phase, activeMilliseconds, startedAt, completedAt, failureReason, retryCount, summary: null };
-    if (phase === "COMPLETED") { if (contacts.length !== 3 || !completedAt || failureReason !== null) return null; const summary = normalizeNightOperationsSummary(own(value, "summary"), partial); return summary ? deepFreeze({ ...partial, summary }) : null; }
+    if (phase === "COMPLETED") { if (contacts.length !== 3 || !completedAt || completedAt !== contacts.at(-1).completedAt || activeMilliseconds !== contacts.at(-1).activeMilliseconds || failureReason !== null) return null; const summary = normalizeNightOperationsSummary(own(value, "summary"), partial); return summary ? deepFreeze({ ...partial, summary }) : null; }
     if (own(value, "summary") !== null) return null;
     if (phase === "FAILED" && (!completedAt || !failureReason || missedWindowIds.length < 2 && failureReason !== "TIMED_OUT")) return null;
     if (phase === "ABANDONED" && !completedAt) return null;
@@ -259,7 +263,7 @@ export function normalizeNightOperationsState(value) {
   try {
     const source = value && typeof value === "object" && !Array.isArray(value) ? value : {}; const activeValue = own(source, "activeRun");
     const activeRun = activeValue === null || activeValue === undefined ? null : normalizeNightOperationsRun(activeValue);
-    const completedRuns = strictArrayTail(own(source, "completedRuns") ?? [], 80, normalizeNightOperationsSummary);
+    const completedRuns = strictArrayTail(own(source, "completedRuns") ?? [], 80, (entry) => normalizeNightOperationsSummary(entry));
     const settledRunIds = strictArrayTail(own(source, "settledRunIds") ?? [], 80, (entry) => text(entry, 64));
     const settlementProofs = strictArrayTail(own(source, "settlementProofs") ?? [], 80, normalizeProof);
     const archive = strictArrayTail(own(source, "archive") ?? [], 80, normalizeNightOperationsRecord);

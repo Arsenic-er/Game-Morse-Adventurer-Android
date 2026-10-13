@@ -11,11 +11,14 @@ test("Chapter 13 screen schedules and exchanges through physical CW with no port
   const screen = read("src/screens/NightOperationsScreen.jsx");
   assert.match(screen, /data-testid="night-operations-screen"/);
   assert.match(screen, /data-night-phase=\{run\.phase\}/);
-  assert.match(screen, /data-night-paused=\{inputBlocked \|\| !windowActive\}/);
+  assert.match(screen, /data-night-paused=\{inputBlocked \|\| leaveOpen \|\| !windowActive\}/);
   assert.match(screen, /data-pulse-count=\{cw\.analysis\.pulseCount\}/);
   assert.match(screen, /data-decoded=\{cw\.analysis\.decoded\}/);
   assert.match(screen, /data-portrait-visible="false"/);
   assert.match(screen, /useCwCore/);
+  assert.match(screen, /setActive\(!inputBlocked && !leaveOpen && windowActive && !terminal\)/);
+  assert.match(screen, /inputBlocked: controlsBlocked \|\| cw\.isPlaying/);
+  assert.match(screen, /submitNightOperationsResponse\(runRef\.current, requested/);
   assert.match(screen, /cw\.beginManual\(\)/);
   assert.match(screen, /cw\.beginAutomatic\("\."\)/);
   assert.match(screen, /cw\.beginAutomatic\("-"\)/);
@@ -47,7 +50,7 @@ test("Chapter 13 mission, replay, operations archive, leave guard, and responsiv
   assert.match(home, /nightOperationsReplayAvailable\(save\)/);
   assert.match(home, /data-action="enter-night-operations-home"/);
   assert.match(home, /data-action="open-station-operations"/);
-  assert.match(mission, /mission\.id === "story-13" && \(active \|\| nightOperationsReplay\)/);
+  assert.match(mission, /mission\.id === "story-13" && \(\(active && !onLaunchChapterThirteen\) \|\| nightOperationsReplay\)/);
   assert.match(mission, /data-action="launch-night-operations"/);
   assert.match(operations, /data-testid="station-operations-modal"/);
   assert.match(operations, /data-operation-run-id/);

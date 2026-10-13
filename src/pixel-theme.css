@@ -2318,3 +2318,14 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
 }
 
 .storm-relay-layout { overflow-wrap: anywhere; }
+
+/* Chapter thirteen: scheduled contacts and localized controls must fit narrow screens. */
+.home-night-operations-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #90b9ff; background: #12192bee; color: #d8e6ff; white-space: normal; overflow-wrap: anywhere; }
+.night-operations-layout, .night-operations-keyer code, .night-operations-keyer > strong { overflow-wrap: anywhere; }
+.night-operations-topbar > div, .night-operations-layout > *, .night-window-grid article { min-width: 0; }
+.night-operations-screen button, .night-operations-topbar h1 { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.night-operations-topbar, .night-operations-topbar > div, .night-operations-keyer > div { flex-wrap: wrap; }
+@media (max-width: 820px) {
+  .night-operations-topbar > div { flex: 1 1 180px; }
+  .night-operations-layout { grid-template-columns: minmax(0, 1fr); }
+}

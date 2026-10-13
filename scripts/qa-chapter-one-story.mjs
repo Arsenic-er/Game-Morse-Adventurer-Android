@@ -1,3 +1,4 @@
+// CWGAME_QA_CHAPTER_THIRTEEN=1 includes Chapters One–Twelve and real-time night windows, long pause, reload and replay.
 // CWGAME_QA_CHAPTER_TWELVE=1 includes Chapters One–Eleven plus keyed conflict verification, relay and replay.
 // CWGAME_QA_CHAPTER_ELEVEN=1 includes Chapters One–Ten and keyed listening calls, pause/reload, no-reply settlement and replay.
 // Listening observations are UI facts, not an audio-hearing acceptance test.
@@ -272,7 +273,7 @@ try {
   assert.equal((await saved()).money,claimed.money);
 
   let chapterTwoEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_TWO === '1' || process.env.CWGAME_QA_CHAPTER_THREE === '1' || (process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1')))) {
+  if (process.env.CWGAME_QA_CHAPTER_TWO === '1' || process.env.CWGAME_QA_CHAPTER_THREE === '1' || (process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1'))))) {
     await click('[data-action="enter-chapter-two-home"]');
     await until('document.querySelector(\'[data-story-chapter="2"][data-story-beat="paper"]\')');
     assert.equal((await saved()).missionState.activeMissions.find(m => m.id === 'story-02')?.id,'story-02');
@@ -391,7 +392,7 @@ try {
   }
 
   let chapterThreeEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_THREE === '1' || (process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1')))) {
+  if (process.env.CWGAME_QA_CHAPTER_THREE === '1' || (process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1'))))) {
     await click('[data-action="enter-chapter-three-home"]');
     await until('document.querySelector(\'[data-story-chapter="3"][data-story-beat="listen"]\')');
     const baseline = await saved();
@@ -508,7 +509,7 @@ try {
 
 
   let chapterFourEvidence = null;
-  if ((process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1')))) {
+  if ((process.env.CWGAME_QA_CHAPTER_FOUR === '1' || (process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1'))))) {
     await click('[data-action="enter-chapter-four-home"]');
     await until('document.querySelector(\'[data-story-chapter="4"][data-story-beat="rain"]\')');
     const baseline = await saved();
@@ -652,7 +653,7 @@ try {
 
 
   let chapterFiveEvidence = null;
-  if ((process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1'))) {
+  if ((process.env.CWGAME_QA_CHAPTER_FIVE === '1' || (process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')))) {
     const baseline = await saved();
     await click('[data-action="enter-chapter-five-home"]');
     await until('document.querySelector(\'[data-story-chapter="5"][data-story-beat="notice"]\')');
@@ -785,7 +786,7 @@ try {
 
 
   let chapterSixEvidence = null;
-  if ((process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1')) {
+  if ((process.env.CWGAME_QA_CHAPTER_SIX === '1' || process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1'))) {
     const baseline = await saved();
     await click('[data-action="enter-chapter-six-home"]');
     await until('document.querySelector(\'[data-story-chapter="6"][data-story-beat="pack"]\')');
@@ -925,7 +926,7 @@ try {
 
 
   let chapterSevenEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1') {
+  if (process.env.CWGAME_QA_CHAPTER_SEVEN === '1' || process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')) {
     assert.equal(await evaluate('!!document.querySelector(\'[data-action="enter-chapter-seven-home"]\')'),false);
     await click('[data-action="open-people-qsl"]');
     await until('document.querySelector(\'[data-testid="people-qsl-modal"]\')');
@@ -1058,7 +1059,7 @@ try {
 
 
   let chapterEightEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1') {
+  if (process.env.CWGAME_QA_CHAPTER_EIGHT === '1' || process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')) {
     console.log('CHAPTER_EIGHT_START');
     await click('[data-action="enter-chapter-eight-home"]');
     await until('document.querySelector(\'[data-story-chapter="8"][data-story-beat="briefing"]\')');
@@ -1176,7 +1177,7 @@ try {
 
 
   let chapterNineEvidence = null;
-  if (process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || process.env.CWGAME_QA_CHAPTER_TWELVE === '1') {
+  if (process.env.CWGAME_QA_CHAPTER_NINE === '1' || process.env.CWGAME_QA_CHAPTER_TEN === '1' || process.env.CWGAME_QA_CHAPTER_ELEVEN === '1' || (process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')) {
     console.log('CHAPTER_NINE_START');
     await click('[data-action="enter-chapter-nine-home"]');
     await until('document.querySelector(\'[data-story-chapter="9"][data-story-beat="sheet"]\')');
@@ -1285,7 +1286,7 @@ try {
 
 
   let chapterTenEvidence=null;
-  if(process.env.CWGAME_QA_CHAPTER_TEN==='1'||process.env.CWGAME_QA_CHAPTER_ELEVEN==='1'||process.env.CWGAME_QA_CHAPTER_TWELVE==='1'){
+  if(process.env.CWGAME_QA_CHAPTER_TEN==='1'||process.env.CWGAME_QA_CHAPTER_ELEVEN==='1'||(process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')){
     console.log('CHAPTER_TEN_START');
     await click('[data-action="enter-chapter-ten-home"]');
     await until('document.querySelector(\'[data-story-chapter="10"][data-story-beat="clock"]\')');
@@ -1403,7 +1404,7 @@ try {
 
 
   let chapterElevenEvidence=null;
-  if(process.env.CWGAME_QA_CHAPTER_ELEVEN==='1'||process.env.CWGAME_QA_CHAPTER_TWELVE==='1'){
+  if(process.env.CWGAME_QA_CHAPTER_ELEVEN==='1'||(process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')){
     console.log('CHAPTER_ELEVEN_START');
     const storyBeat=beat=>'document.querySelector(\'[data-story-chapter="11"][data-story-beat="'+beat+'"]\')';
     const listeningPhase=phase=>'document.querySelector(".listening-screen")?.dataset.listeningPhase==='+JSON.stringify(phase);
@@ -1496,7 +1497,7 @@ try {
 
 
   let chapterTwelveEvidence=null;
-  if(process.env.CWGAME_QA_CHAPTER_TWELVE==='1'){
+  if((process.env.CWGAME_QA_CHAPTER_TWELVE==='1'||process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1')){
     console.log('CHAPTER_TWELVE_START');
     const storyBeat=beat=>'document.querySelector(\'[data-story-chapter="12"][data-story-beat="'+beat+'"]\')';
     const stormPhase=phase=>'document.querySelector(".storm-relay-screen")?.dataset.stormPhase==='+JSON.stringify(phase);
@@ -1590,6 +1591,105 @@ try {
     console.log('CHAPTER_TWELVE_PASSED',JSON.stringify(chapterTwelveEvidence));
   }
 
+
+  let chapterThirteenEvidence=null;
+  if(process.env.CWGAME_QA_CHAPTER_THIRTEEN==='1'){
+    console.log('CHAPTER_THIRTEEN_START');
+    const storyBeat=beat=>'document.querySelector(\'[data-story-chapter="13"][data-story-beat="'+beat+'"]\')';
+    const nightPhase=phase=>'document.querySelector(".night-operations-screen")?.dataset.nightPhase==='+JSON.stringify(phase);
+    const reopen=async()=>{await navigate('Page.reload');await click('.menu-primary');await click('.save-primary-action');await click('[data-action="enter-chapter-thirteen-home"]');};
+    const activeRun=async()=>(await saved()).storyContinuationState.chapter13.activeRun;
+    const options={surface:'.night-operations-screen',submit:'[data-action="night-submit"]'};
+    const target=()=>evaluate('document.querySelector(".night-operations-keyer code").textContent');
+    const blockedKey=async()=>{
+      await call('Input.dispatchKeyEvent',{type:'keyDown',key:'z',code:'KeyZ'});await pause(180);
+      await call('Input.dispatchKeyEvent',{type:'keyUp',key:'z',code:'KeyZ'});await pause(1600);
+      assert.equal(await evaluate('Number(document.querySelector(".night-operations-screen").dataset.pulseCount)'),0);
+    };
+    await click('[data-action="enter-chapter-thirteen-home"]');await until(storyBeat('late'));
+    const baseline=await saved();assert(baseline.missionState.activeMissions.some(m=>m.id==='story-13'));
+    await screenshot('113-chapter-thirteen-late');await finishScene('chapter-thirteen-primary');
+    await reopen();await until(storyBeat('schedule'));await finishScene('chapter-thirteen-primary');await until(storyBeat('watch'));
+    await click('[data-action="vn-notes"]');await screenshot('114-chapter-thirteen-instructions');await click('.vn-modal header button');
+    await finishScene('chapter-thirteen-primary');await until(nightPhase('BOARD'));await call('Page.bringToFront');
+    const initial=await activeRun();assert.equal(initial.windows.length,4);
+    const playWatch=async(first)=>{
+      for(let index=0;index<3;index++){
+        console.log('NIGHT_WAIT_WINDOW',index+1,first?'story':'replay');
+        await until('!!document.querySelector(\'[data-action="night-select-window"][data-window-id="night-window-'+(index+1)+'"]\')',100000);
+        await click('[data-action="night-select-window"][data-window-id="night-window-'+(index+1)+'"]');await until(nightPhase('CALL'));
+        if(first&&index===0){
+          await sendText('BAD K',options);assert.equal((await activeRun()).phase,'CALL');
+          await sendText('QRS K',options);assert.deepEqual((await activeRun()).recoveryActions,['QRS']);
+          await click('[data-action="night-settings"]');await until('document.querySelector(".settings-modal")');await pause(150);
+          const settingsRun=await activeRun();await blockedKey();
+          console.log('NIGHT_LONG_PAUSE_START');
+          await pause(65000);assert.deepEqual(await activeRun(),settingsRun);
+          assert.equal(await evaluate('document.querySelector(".night-operations-screen").dataset.nightPaused'),'true');
+          await screenshot('115-chapter-thirteen-settings-paused');await click('.settings-modal header .icon-button');
+        }
+        await sendText(await target(),options);await until(nightPhase('EXCHANGE'));
+        if(first&&index===0){
+          await click('[data-action="night-back"]');await until('document.querySelector(".night-operations-leave-dialog")');await pause(150);
+          const interrupted=await activeRun();await blockedKey();assert.deepEqual(await activeRun(),interrupted);
+          await screenshot('116-chapter-thirteen-leave-paused');await click('[data-action="night-confirm-leave"]');await until(storyBeat('watch'));
+          await reopen();assert.deepEqual(await activeRun(),interrupted);await finishScene('chapter-thirteen-primary');
+          await until(nightPhase('EXCHANGE'));await call('Page.bringToFront');assert.equal((await activeRun()).runId,initial.runId);
+        }
+        await sendText(await target(),options);
+        await until(index===2?nightPhase('COMPLETED'):nightPhase('WINDOW_CLOSED'));
+        assert.equal((await activeRun()).contacts.length,index+1);
+        if(first)await screenshot('117-'+index+'-chapter-thirteen-contact');
+      }
+    };
+    await playWatch(true);
+    const finished=await activeRun();assert(finished.activeMilliseconds>=210000);assert.equal(finished.contacts.length,3);
+    assert(Date.parse(finished.contacts[0].completedAt)-Date.parse(finished.startedAt)>=initial.windows[0].closesAtMilliseconds,'paused wall-clock completion exceeds the first window but remains valid');
+    await reopen();await finishScene('chapter-thirteen-primary');await until(nightPhase('COMPLETED'));
+    assert.deepEqual(await activeRun(),finished);assert.equal((await saved()).qsoLogs.length,baseline.qsoLogs.length);
+    await screenshot('118-chapter-thirteen-completed-unsettled');await click('[data-action="night-settle"]');
+    await until('document.querySelector(".night-operations-screen")?.dataset.settled==="true"');
+    const settled=await saved(),chapter=settled.storyContinuationState.chapter13,record=chapter.archive.find(r=>r.runId===finished.runId);
+    assert(record);assert.equal(new Set(record.contacts.map(c=>c.personId)).size,3);
+    assert(chapter.settledRunIds.includes(record.runId));assert(chapter.completedRuns.some(r=>r.runId===record.runId));
+    assert(chapter.settlementProofs.some(p=>p.runId===record.runId&&p.recordId===record.id));
+    const contacts=record.contacts.map(c=>settled.qsoLogs.find(q=>q.id===c.qsoId));assert(contacts.every(q=>q.eventKind==='night-operations'&&q.eventRunId===record.runId&&q.credits===0&&q.isFictional));
+    assert.equal(settled.qsoRecords.total,baseline.qsoRecords.total+3);assert.equal(settled.money,baseline.money);assert.equal(settled.technologyPoints,baseline.technologyPoints);
+    assert.equal(await evaluate('document.querySelector(\'[data-action="night-settle"]\').disabled'),true);
+    await click('[data-action="continue-chapter-thirteen"]');await until(storyBeat('contacts'));
+    const line=await evaluate('document.querySelector(".vn-line").getAttribute("aria-label")');for(const contact of record.contacts)assert(line.includes(contact.callsign+' / '+contact.band));
+    await screenshot('119-chapter-thirteen-contacts');await finishScene('chapter-thirteen-primary');await until(storyBeat('log'));
+    await click('[data-action="vn-notes"]');const logText=await evaluate('document.querySelector(\'[data-testid="chapter-thirteen-real-log"]\').innerText');
+    for(const value of [record.id,...record.contacts.map(c=>c.callsign),'未完成的窗口不会写成已联络'])assert(logText.includes(value));
+    await screenshot('120-chapter-thirteen-log');await click('.vn-modal header button');
+    const beforeClaim=await saved();await reopen();await until(storyBeat('log'));assert.equal((await saved()).money,beforeClaim.money);
+    await finishScene('chapter-thirteen-primary');await until('document.querySelector(\'[data-story-chapter="13"][data-story-status="claimed"]\')');
+    const claimed=await saved(),achievementIds=claimed.claimedAchievementRewards.filter(id=>!beforeClaim.claimedAchievementRewards.includes(id));
+    const achievements=ACHIEVEMENT_CATALOG.filter(item=>achievementIds.includes(item.id));
+    const achievementMoney=achievements.reduce((sum,item)=>sum+item.moneyReward,0),achievementPoints=achievements.reduce((sum,item)=>sum+item.technologyPointsReward,0);
+    assert.equal(claimed.money,beforeClaim.money+1500+achievementMoney);assert.equal(claimed.technologyPoints,beforeClaim.technologyPoints+6+achievementPoints);
+    assert(claimed.storyContinuationState.chapter13.taskTreeUnlocked);assert.equal(claimed.missionState.claimedMissionIds.filter(id=>id==='story-13').length,1);
+    await screenshot('121-chapter-thirteen-claimed');
+    for(let n=0;n<10&&await evaluate('!!document.querySelector(".achievement-notification > button")');n++){await click('.achievement-notification > button');await pause(120);}
+    await click('[data-action="chapter-thirteen-primary"]');await until('document.querySelector(".home-screen")');
+    assert.equal(await evaluate('!!document.querySelector(\'[data-action="enter-chapter-thirteen-home"]\')'),false);
+    await click('[data-action="open-missions"]');await until('document.querySelector(\'[data-mission-id="story-14"][data-mission-status="available"]\')');
+    await screenshot('122-chapter-fourteen-unlocked');await click('.mission-center-modal header .icon-button');
+    await navigate('Page.reload');await click('.menu-primary');await click('.save-primary-action');
+    assert.equal((await saved()).money,claimed.money);assert.equal((await saved()).technologyPoints,claimed.technologyPoints);
+    await click('[data-action="enter-night-operations-home"]');await until(nightPhase('BOARD'));await call('Page.bringToFront');
+    await playWatch(false);
+    await click('[data-action="night-settle"]');await until('document.querySelector(".night-operations-screen")?.dataset.settled==="true"');
+    const replay=await saved(),replayRecord=replay.storyContinuationState.chapter13.archive.at(-1);
+    assert.notEqual(replayRecord.id,record.id);assert.equal(replay.storyContinuationState.chapter13.archive.length,chapter.archive.length+1);
+    assert.equal(replay.money,claimed.money);assert.equal(replay.technologyPoints,claimed.technologyPoints);assert.equal(replay.qsoRecords.total,claimed.qsoRecords.total+3);
+    assert.equal(replay.chapterThirteenPresentation.recordId,record.id);
+    assert.equal(await evaluate('!!document.querySelector(\'[data-action="continue-chapter-thirteen"]\')'),false);
+    await screenshot('123-chapter-thirteen-replay-saved');await click('[data-action="night-back"]');await until('document.querySelector(".home-screen")');
+    chapterThirteenEvidence={passed:true,record,replayRecord,keyEventInput:true,keyerWpm:30,localRulesFallback:true,realTimeWindows:true,invalidCallRetry:true,recoveryAction:'QRS',openingReload:true,exchangeReload:true,completedUnsettledReload:true,endingReload:true,settingsFreeze:true,longPauseMilliseconds:65000,leaveDialogFreeze:true,newQsoCount:3,settlementMoney:0,moneyBeforeClaim:beforeClaim.money,moneyAfterClaim:claimed.money,technologyPointsBeforeClaim:beforeClaim.technologyPoints,technologyPointsAfterClaim:claimed.technologyPoints,achievementIds,achievementMoney,achievementPoints,replaySettled:true,originalRecordPinned:true,chapterFourteenUnlocked:true,duplicateReward:false};
+    console.log('CHAPTER_THIRTEEN_PASSED',JSON.stringify(chapterThirteenEvidence));
+  }
+
   const finalMoney=(await saved()).money;
 
   await navigate('Page.navigate',{url:new URL('?review=chapter-1',baseUrl).href});
@@ -1597,7 +1697,7 @@ try {
   assert.equal((await saved()).money,finalMoney);
   await screenshot('10-review-preserved');
   assert.equal(exceptions.length,0,JSON.stringify(exceptions));
-  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,baseUrl,fixtureWpm,recordedAt:new Date().toISOString(),actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,chapterTwo:chapterTwoEvidence,chapterThree:chapterThreeEvidence,chapterFour:chapterFourEvidence,chapterFive:chapterFiveEvidence,chapterSix:chapterSixEvidence,chapterSeven:chapterSevenEvidence,chapterEight:chapterEightEvidence,chapterNine:chapterNineEvidence,chapterTen:chapterTenEvidence,chapterEleven:chapterElevenEvidence,chapterTwelve:chapterTwelveEvidence,qaClockUtc:qaClockEpoch===null?null:new Date(qaClockEpoch).toISOString(),bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
+  await writeFile(path.join(output,'evidence.json'),JSON.stringify({passed:true,profile,baseUrl,fixtureWpm,recordedAt:new Date().toISOString(),actual:{id:actual.id,callsign:actual.callsign,sent:actual.sent,received:actual.received},moneyBeforeClaim:qsoSaved.money,moneyAfterClaim:claimed.money,keyEventInput:true,qaCapture:true,audioPlaybackSkipped:true,invalidInputRetry:true,settingsPause:true,artDialogFocus:true,mobileLayout:true,chapterTwoUnlocked:true,chapterTwo:chapterTwoEvidence,chapterThree:chapterThreeEvidence,chapterFour:chapterFourEvidence,chapterFive:chapterFiveEvidence,chapterSix:chapterSixEvidence,chapterSeven:chapterSevenEvidence,chapterEight:chapterEightEvidence,chapterNine:chapterNineEvidence,chapterTen:chapterTenEvidence,chapterEleven:chapterElevenEvidence,chapterTwelve:chapterTwelveEvidence,chapterThirteen:chapterThirteenEvidence,qaClockUtc:qaClockEpoch===null?null:new Date(qaClockEpoch).toISOString(),bookmarkReload:true,endingReload:true,duplicateReward:false,reviewPreserved:true,exceptions},null,2));
   console.log(JSON.stringify({passed:true,profile,output}));
 }
 catch(error){
