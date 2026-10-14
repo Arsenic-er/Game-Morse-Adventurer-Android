@@ -279,7 +279,7 @@ export function emptyFinalPromiseState() { return Object.freeze({ version: FINAL
 export function normalizeFinalPromiseState(value) {
   try {
     const source = value && typeof value === "object" && !Array.isArray(value) ? value : {}; const activeValue = own(source, "activeRun"); const activeRun = activeValue == null ? null : normalizeFinalPromiseRun(activeValue);
-    const completedRuns = strictArrayTail(own(source, "completedRuns") ?? [], 80, normalizeFinalPromiseSummary); const settledRunIds = uniqueSortedIds(own(source, "settledRunIds") ?? []);
+    const completedRuns = strictArrayTail(own(source, "completedRuns") ?? [], 80, (entry) => normalizeFinalPromiseSummary(entry)); const settledRunIds = uniqueSortedIds(own(source, "settledRunIds") ?? []);
     const settlementProofs = strictArrayTail(own(source, "settlementProofs") ?? [], 80, normalizeFinalPromiseProof);
     const archive = strictArrayTail(own(source, "archive") ?? [], 80, normalizeFinalPromiseRecord);
     if ((activeValue != null && !activeRun) || !completedRuns || !settledRunIds || !settlementProofs || !archive) return emptyFinalPromiseState();

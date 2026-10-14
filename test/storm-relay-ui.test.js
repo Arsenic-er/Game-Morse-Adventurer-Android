@@ -14,7 +14,7 @@ test("Chapter 12 screen uses physical CW for check-in, verification, and relay w
   assert.match(screen, /data-testid="storm-relay-screen"/);
   assert.match(screen, /data-simulation="fictional-storm-relay"/);
   assert.match(screen, /data-storm-phase=\{run\.phase\}/);
-  assert.match(screen, /data-storm-paused=\{inputBlocked \|\| !windowActive\}/);
+  assert.match(screen, /data-storm-paused=\{inputBlocked \|\| leaveOpen \|\| !windowActive\}/);
   assert.match(screen, /data-pulse-count=\{cw\.analysis\.pulseCount\}/);
   assert.match(screen, /data-decoded=\{cw\.analysis\.decoded\}/);
   assert.match(screen, /data-portrait-visible="false"/);
@@ -51,7 +51,7 @@ test("Chapter 12 route, mission, replay, archive, leave guard, and responsive co
   assert.match(app, /screen === "storm-relay"/);
   assert.match(home, /stormRelayReplayAvailable\(save\)/);
   assert.match(home, /data-action="enter-storm-relay-home"/);
-  assert.match(mission, /mission\.id === "story-12" && \(active \|\| stormRelayReplay\)/);
+  assert.match(mission, /mission\.id === "story-12" && \(\(active && !onLaunchChapterTwelve\) \|\| stormRelayReplay\)/);
   assert.match(mission, /data-action="launch-storm-relay"/);
   assert.match(archive, /stormRecords/);
   assert.match(css, /@media \(max-width: 820px\)[\s\S]*\.storm-relay-screen/);

@@ -98,7 +98,9 @@ export function settleStormRelayRun(save, runValue, settledAtValue) {
   const chapter = normalizeStormRelayState(continuation.chapter12);
   if (chapter.settledRunIds.includes(run.runId)) return zero(save, "ALREADY_SETTLED");
   const mission = activeMission(save);
-  if (!mission || Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt)
+  const claimed = ownArrayTail(own(own(save,"missionState"),"claimedMissionIds"),64);
+  const replay = chapter.taskTreeUnlocked && claimed?.includes("story-12");
+  if ((!mission && !replay) || (mission && Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt))
     || !chapter.activeRun || chapter.activeRun.runId !== run.runId || !same(chapter.activeRun, run)
     || String(own(save, "callsign") ?? "").trim().toUpperCase() !== run.playerCallsign) return zero(save, "RUN_STATE_MISMATCH");
 

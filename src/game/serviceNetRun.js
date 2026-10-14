@@ -354,15 +354,16 @@ export function retryServiceNetRun(value, startedAt) {
   const run = normalizeServiceNetRun(value);
   const start = iso(startedAt);
   if (!run || !start || ![SERVICE_NET_PHASES.FAILED, SERVICE_NET_PHASES.ABANDONED].includes(run.phase)) return value;
-  return newRun({
+  const retried = newRun({
     playerCallsign: run.playerCallsign,
     scheduleId: run.scheduleId,
     messages: run.messages,
     priorityOrder: run.priorityOrder,
     startedAt: start,
     retryCount: run.retryCount + 1,
-    checkedIn: true,
+    checkedIn: Boolean(run.checkedInAt),
   });
+  return run.checkedInAt ? retried : transition(retried, { phase: SERVICE_NET_PHASES.CHECK_IN });
 }
 
 export function normalizeServiceNetRun(value) {
@@ -422,14 +423,15 @@ export function normalizeServiceNetRun(value) {
       startedAt,
     };
     const terminal = TERMINAL_PHASES.has(phase);
-    const checkedInRequired = ![SERVICE_NET_PHASES.BRIEFING, SERVICE_NET_PHASES.CHECK_IN].includes(phase);
+    const beforeCheckIn = [SERVICE_NET_PHASES.BRIEFING, SERVICE_NET_PHASES.CHECK_IN].includes(phase);
+    const checkedInRequired = [SERVICE_NET_PHASES.RECEIVE_MESSAGE, SERVICE_NET_PHASES.PLAYER_ACK, SERVICE_NET_PHASES.COMPLETED].includes(phase);
     if (!run.runId || !run.scheduleId || !run.playerCallsign || run.personId !== "person:procedural:chapter08-net-control"
       || run.stationId !== "station:procedural:chapter08-net-control" || run.callsign !== "SIM8PS"
       || run.npcId !== "chapter08-net-control" || run.simulation !== "fictional-public-service"
       || !PHASES.has(phase) || !startedAt || run.runId !== runIdFor(run.scheduleId, startedAt, run.retryCount)
       || run.currentPosition == null || run.currentPosition !== receipts.length || run.elapsedMilliseconds == null
       || run.currentMessageErrors == null || !errors || !recoveryActions || run.replyWpm == null
-      || (checkedInRequired !== Boolean(checkedInAt)) || (checkedInAt && Date.parse(checkedInAt) < Date.parse(startedAt))
+      || (checkedInRequired && !checkedInAt) || (beforeCheckIn && checkedInAt) || (!checkedInAt && receipts.length > 0) || (checkedInAt && Date.parse(checkedInAt) < Date.parse(startedAt))
       || (terminal !== Boolean(completedAt)) || (completedAt && Date.parse(completedAt) < Date.parse(checkedInAt ?? startedAt))
       || (phase === SERVICE_NET_PHASES.COMPLETED && receipts.length !== 3)
       || (receipts.length === 3 && phase !== SERVICE_NET_PHASES.COMPLETED)

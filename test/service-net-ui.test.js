@@ -28,7 +28,7 @@ test("Chapter 8 exposes the fictional service queue, hard fields, recovery, and 
   assert.match(screenSource, /data-service-receipt-count=/);
   assert.match(screenSource, /data-action="service-net-submit"/);
   assert.match(screenSource, /data-settlement-attempts=\{settlementAttempts\}/);
-  assert.match(screenSource, /data-action="service-net-settle" disabled=\{inputBlocked\}/);
+  assert.match(screenSource, /data-action="service-net-settle" disabled=\{inputBlocked \|\| settled \|\| leaveOpen\}/);
   assert.match(screenSource, /settled && <p className="service-net-settlement-banner" role="status">\{settledText\}/);
   assert.match(screenSource, /run\.phase !== SERVICE_NET_PHASES\.COMPLETED && run\.errors\.length > 0/);
   assert.equal(Object.keys(SERVICE_NET_SETTLED_TEXT).length, 7);
@@ -56,8 +56,10 @@ test("Chapter 8 leave risk distinguishes active, completed-unsettled, and safe s
 });
 
 test("accepted Chapter 8 and its durable unlock expose the intended entry actions", () => {
-  assert.match(missionSource, /mission\.id === "story-08" && \(active \|\| serviceNetReplay\)/);
+  assert.match(missionSource, /mission\.id === "story-08" && \(\(active && !onLaunchChapterEight\) \|\| serviceNetReplay\)/);
   assert.match(missionSource, /data-action="launch-service-net"/);
+  assert.match(missionSource, /mission\.id === "story-08" && \(active \|\| ready\) && onLaunchChapterEight/);
+  assert.match(missionSource, /data-action="launch-chapter-eight"/);
   assert.match(homeSource, /serviceNetReplayAvailable\(save\)/);
   assert.match(homeSource, /data-action="enter-service-net-home"/);
 });

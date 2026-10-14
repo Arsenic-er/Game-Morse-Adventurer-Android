@@ -1,3 +1,12 @@
+import {normalizeChapterFifteenPresentation} from "./chapterFifteenStory.js";
+import {normalizeChapterFourteenPresentation} from "./chapterFourteenStory.js";
+import {normalizeChapterThirteenPresentation} from "./chapterThirteenStory.js";
+import {normalizeChapterElevenPresentation} from "./chapterElevenStory.js";
+import {normalizeChapterTwelvePresentation} from "./chapterTwelveStory.js";
+import {normalizeChapterTenPresentation} from "./chapterTenStory.js";
+import { normalizeChapterNinePresentation } from "./chapterNineStory.js";
+import { normalizeChapterEightPresentation } from "./chapterEightStory.js";
+import { normalizeChapterSevenPresentation } from "./chapterSevenStory.js";
 import { normalizeChapterSixPresentation } from "./chapterSixStory.js";
 import { normalizeChapterFivePresentation } from "./chapterFiveStory.js";
 import { normalizeChapterOnePresentation } from "./chapterOneStory.js";
@@ -111,6 +120,15 @@ export function createSave({
     chapterFourPresentation: normalizeChapterFourPresentation(null),
     chapterFivePresentation: normalizeChapterFivePresentation(null),
     chapterSixPresentation: normalizeChapterSixPresentation(null),
+    chapterSevenPresentation: normalizeChapterSevenPresentation(null),
+    chapterEightPresentation: normalizeChapterEightPresentation(null),
+    chapterNinePresentation: normalizeChapterNinePresentation(null),
+    chapterTenPresentation: normalizeChapterTenPresentation(null),
+    chapterElevenPresentation: normalizeChapterElevenPresentation(null),
+    chapterTwelvePresentation: normalizeChapterTwelvePresentation(null),
+    chapterThirteenPresentation: normalizeChapterThirteenPresentation(null),
+    chapterFifteenPresentation: normalizeChapterFifteenPresentation(null),
+    chapterFourteenPresentation: normalizeChapterFourteenPresentation(null),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: emptyWorldCalendarState(),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,
@@ -220,6 +238,15 @@ export function normalizeSave(save) {
     chapterFourPresentation: normalizeChapterFourPresentation(Object.getOwnPropertyDescriptor(save, "chapterFourPresentation")?.value),
     chapterFivePresentation: normalizeChapterFivePresentation(Object.getOwnPropertyDescriptor(save, "chapterFivePresentation")?.value),
     chapterSixPresentation: normalizeChapterSixPresentation(Object.getOwnPropertyDescriptor(save, "chapterSixPresentation")?.value),
+    chapterSevenPresentation: normalizeChapterSevenPresentation(Object.getOwnPropertyDescriptor(save, "chapterSevenPresentation")?.value),
+    chapterEightPresentation: normalizeChapterEightPresentation(Object.getOwnPropertyDescriptor(save, "chapterEightPresentation")?.value),
+    chapterNinePresentation: normalizeChapterNinePresentation(Object.getOwnPropertyDescriptor(save, "chapterNinePresentation")?.value),
+    chapterTenPresentation: normalizeChapterTenPresentation(Object.getOwnPropertyDescriptor(save, "chapterTenPresentation")?.value),
+    chapterElevenPresentation: normalizeChapterElevenPresentation(Object.getOwnPropertyDescriptor(save, "chapterElevenPresentation")?.value),
+    chapterTwelvePresentation: normalizeChapterTwelvePresentation(Object.getOwnPropertyDescriptor(save, "chapterTwelvePresentation")?.value),
+    chapterThirteenPresentation: normalizeChapterThirteenPresentation(Object.getOwnPropertyDescriptor(save, "chapterThirteenPresentation")?.value),
+    chapterFifteenPresentation: normalizeChapterFifteenPresentation(Object.getOwnPropertyDescriptor(save, "chapterFifteenPresentation")?.value),
+    chapterFourteenPresentation: normalizeChapterFourteenPresentation(Object.getOwnPropertyDescriptor(save, "chapterFourteenPresentation")?.value),
     worldCalendarVersion: WORLD_CALENDAR_VERSION,
     worldCalendarState: normalizeWorldCalendarState(save?.worldCalendarState),
     lightsEventStateVersion: LIGHTS_EVENT_STATE_VERSION,

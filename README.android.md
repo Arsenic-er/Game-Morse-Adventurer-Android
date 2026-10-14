@@ -2,9 +2,9 @@
 
 This repository packages the CWGame React/Vite edition as a native Android application with Capacitor.
 
-## Included in the first Android edition
+## Included in the current Android edition
 
-- The complete v0.45 gameplay set (Chapters 115 and Open Station), plus the latest visual-novel story presentation through the completed Chapter 6 server checkpoint (source baseline `c715e97`).
+- The complete v0.45 gameplay set (Chapters 1–15 and Open Station), including the completed visual-novel presentation through Chapter 15 (source baseline `6bb4479`).
 - Offline Web Audio CW keying and playback, local save slots, seven interface languages, and responsive touch input.
 - The trained `QsoSemanticFormer v0.4` INT8 ONNX model runs locally through ONNX Runtime Web/WASM. If the runtime cannot load, the existing deterministic interpreter remains the safe fallback.
 - Android back-button protection for active or completed-but-unsaved QSOs.
@@ -17,8 +17,10 @@ The project is developed and built on `gpu-821560` at `/home/ubuntu/cwgame-andro
 ```sh
 export PATH=/home/ubuntu/.local/share/cwgame-tools/node-v24.21.0-linux-x64/bin:$PATH
 export JAVA_HOME=/home/ubuntu/.local/share/cwgame-android-tools/jdk-21
-export ANDROID_SDK_ROOT=/home/ubuntu/.local/share/cwgame-android-tools/android-sdk
-export PATH=$JAVA_HOME/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+export ANDROID_SDK_ROOT=/home/ubuntu/cwidentifier/tools/android-20261006/sdk
+export ANDROID_USER_HOME=/home/ubuntu/.cache/cwgame-android-user
+export GRADLE_USER_HOME=/home/ubuntu/.cache/cwgame-android-gradle
+export PATH=$JAVA_HOME/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
 pnpm install --frozen-lockfile
 pnpm test
 pnpm android:debug

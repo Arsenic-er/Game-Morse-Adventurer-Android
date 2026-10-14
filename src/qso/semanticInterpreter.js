@@ -26,7 +26,7 @@ export const TRAFFIC_REGISTERS = Object.freeze([
 const TOPIC_KEYWORDS = Object.freeze({
   NAME: ["NAME"],
   AGE: ["AGE"],
-  LOCATION: ["QTH", "LOC"],
+  LOCATION: ["QTH", "LOC", "GRID"],
   WEATHER: ["WX", "WEATHER"],
   POWER: ["PWR", "POWER", "W"],
   RIG: ["RIG", "RADIO"],
@@ -183,10 +183,11 @@ function genericTraffic({ message, selfCallsign, peerCallsign, pendingQuestion }
   }
   const rstMatch = compact.match(/RST([1-5][1-9][1-9])/);
   if (rstMatch) slots.push(Object.freeze({ topic: "RST", role: "VALUE", value: rstMatch[1], confidence: 1 }));
-  if (tokens.includes("R") || tokens.includes("RR")) acts.ACK = 1;
+  if (tokens.includes("R") || tokens.includes("RR") || tokens.includes("ACK")) acts.ACK = 1;
   if (tokens.includes("TNX") || tokens.includes("TKS")) acts.THANKS = 1;
   if (tokens.includes("73") || tokens.includes("SK")) acts.SIGNOFF = 1;
   if (tokens.includes("AGN") || normalized.includes("?")) acts.ASK = 1;
+  if (tokens.includes("QRS")) acts.SPEED_REQUEST = 1;
 
   for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
     if (keywords.some((keyword) => tokens.includes(keyword))) topics[topic] = 1;

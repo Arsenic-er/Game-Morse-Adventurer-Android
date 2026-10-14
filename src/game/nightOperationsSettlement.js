@@ -68,7 +68,9 @@ export function settleNightOperationsRun(save, runValue, settledAtValue) {
   const continuation = normalizeStoryContinuationState(own(save, "storyContinuationState")); const chapter = normalizeNightOperationsState(continuation.chapter13);
   if (chapter.settledRunIds.includes(run.runId)) return zero(save, "ALREADY_SETTLED");
   const mission = activeMission(save);
-  if (!mission || Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt) || !chapter.activeRun
+  const claimed = ownArrayTail(own(own(save,"missionState"),"claimedMissionIds"),64);
+  const replay = chapter.taskTreeUnlocked && claimed?.includes("story-13");
+  if ((!mission && !replay) || (mission && Date.parse(own(mission, "acceptedAt")) > Date.parse(run.startedAt)) || !chapter.activeRun
     || chapter.activeRun.runId !== run.runId || !same(chapter.activeRun, run)
     || String(own(save, "callsign") ?? "").trim().toUpperCase() !== run.playerCallsign) return zero(save, "RUN_STATE_MISMATCH");
   const suffix = run.runId.slice("night-operations:".length);

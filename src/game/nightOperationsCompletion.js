@@ -44,7 +44,7 @@ export function verifiedNightOperationsCompletion(save, active) {
     const logs = ownArrayTail(own(save, "qsoLogs"), 200); if (!logs) return false;
     const relationships = normalizeOperatorRelationships(own(save, "operatorRelationships"));
     for (const record of chapter.archive) {
-      if (baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt) || !chapter.settledRunIds.includes(record.runId)) continue;
+      if (record.playerCallsign !== own(save,"callsign") || baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt) || !chapter.settledRunIds.includes(record.runId)) continue;
       const summary = chapter.completedRuns.find(({ runId }) => runId === record.runId);
       const proof = chapter.settlementProofs.find(({ runId }) => runId === record.runId);
       if (!summary || !proof || proof.recordId !== record.id || proof.completedAt !== record.completedAt

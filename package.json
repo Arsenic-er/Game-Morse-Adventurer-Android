@@ -15,7 +15,7 @@
     "build": "vite build && pnpm build:size",
     "build:size": "node scripts/report-build-size.mjs",
     "preview": "vite preview",
-    "test": "node --test",
+    "test": "node --test --test-concurrency=1",
     "npc:generate": "node scripts/generate-npc-roster.mjs",
     "qso:simulate:poor": "node scripts/simulate-poor-qso.mjs",
     "qso:calibrate": "node scripts/calibrate-operators.mjs",

@@ -129,3 +129,21 @@
 @media (prefers-reduced-motion: reduce) {
   .vn-background, .vn-portrait, .vn-scene-heading, .vn-advance-mark.is-ready { animation: none; }
 }
+
+/* Chapter 15 keeps choices in normal flow so long translations cannot cover dialogue. */
+.chapter-fifteen-story-screen[data-story-beat="choose"] .vn-interface { display: flex; flex-direction: column; overflow-y: auto; }
+.chapter-fifteen-story-screen[data-story-beat="choose"] .vn-header { position: relative; flex-shrink: 0; }
+.chapter-fifteen-story-screen[data-story-beat="choose"] .vn-scene-heading { position: relative; top: auto; left: auto; max-width: none; margin: 12px 5%; flex-shrink: 0; }
+.chapter-fifteen-story-screen[data-story-beat="choose"] .vn-dialogue { position: relative; inset: auto; margin: 28px 5% 24px; flex-shrink: 0; }
+.chapter-fifteen-choices { width: min(680px, 90%); margin: auto; padding: 14px 20px; background: #091923ee; border: 1px solid #e6c58470; box-sizing: border-box; flex-shrink: 0; }
+.chapter-fifteen-choices h2 { font-size: 16px; color: #ffe4a8; margin: 0 0 12px; }
+.chapter-fifteen-choice-list { display: grid; gap: 8px; }
+.chapter-fifteen-choice-list button { display: flex; align-items: center; gap: 12px; text-align: left; min-height: 44px; padding: 10px 14px; color: #dfebed; background: #102630; border: 1px solid #8fb7be66; font: inherit; overflow-wrap: anywhere; }
+.chapter-fifteen-choice-list button[aria-pressed="true"] { color: #fff0c4; background: #38301d; border-color: #e6c584; box-shadow: inset 3px 0 #e6c584; }
+.chapter-fifteen-choice-list button:focus-visible { outline: 2px solid #bfe5ef; outline-offset: 2px; }
+.chapter-fifteen-choices p { font-size: 12px; line-height: 1.6; color: #bdccd0; margin: 12px 0 0; }
+@media (max-width: 520px) {
+ .chapter-fifteen-choices { width: calc(100% - 24px); padding: 12px; }
+ .chapter-fifteen-story-screen[data-story-beat="choose"] .vn-dialogue { margin: 26px 12px 18px; }
+ .chapter-fifteen-story-screen[data-story-beat="choose"] .vn-scene-heading { margin: 10px 18px; }
+}

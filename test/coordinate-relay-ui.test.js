@@ -22,7 +22,7 @@ test("Chapter 9 screen exposes fictional Pixel Grid source, relay, fields, recov
   assert.doesNotMatch(screen, /<input\b/);
   assert.match(screen, /data-action="coordinate-settle"/);
   assert.match(screen, /data-settlement-attempts=\{settlementAttempts\}/);
-  assert.match(screen, /data-action="coordinate-settle" disabled=\{inputBlocked\}/);
+  assert.match(screen, /data-action="coordinate-settle" disabled=\{inputBlocked \|\| settled \|\| leaveOpen\}/);
   assert.match(screen, /settled && <p className="coordinate-relay-settlement-banner" role="status">\{settledText\}/);
   assert.equal(Object.keys(COORDINATE_RELAY_SETTLED_TEXT).length, 7);
   assert.match(screen, /cwgameSystem\?\.interpretCwTraffic/);

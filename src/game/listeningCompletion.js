@@ -78,7 +78,8 @@ export function verifiedListeningCompletion(save, active) {
     const chapter = normalizeListeningState(own(own(save, "storyContinuationState"), "chapter11"));
     for (const record of chapter.archive) {
       if (
-        baseline.has(record.runId)
+        record.playerCallsign !== own(save, "callsign")
+        || baseline.has(record.runId)
         || Date.parse(record.completedAt) < Date.parse(acceptedAt)
         || !matchingSummaryRecordProof(chapter, record.runId)
       ) continue;

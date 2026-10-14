@@ -31,12 +31,13 @@ function iso(value) {
   return Number.isFinite(time) && new Date(time).toISOString() === value ? value : null;
 }
 
-function verifiedLog(log, { id, runId, callsign, npcId, personId, stationId, completedAt }) {
+function verifiedLog(log, { id, runId, callsign, playerCallsign, npcId, personId, stationId, completedAt }) {
   const claim = log ? {
     callsign: own(log, "callsign"), personId: own(log, "personId"), stationId: own(log, "stationId"),
   } : null;
   return Boolean(log) && own(log, "id") === id && own(log, "eventKind") === "storm-relay"
     && own(log, "eventRunId") === runId && own(log, "callsign") === callsign
+    && own(log, "playerCallsign") === playerCallsign
     && own(log, "operatorProfileId") === npcId && own(log, "personId") === personId
     && own(log, "stationId") === stationId && own(log, "credits") === 0
     && own(log, "isFictional") === true && Date.parse(own(log, "completedAt") ?? "") === Date.parse(completedAt)
@@ -58,7 +59,7 @@ export function verifiedStormRelayCompletion(save, active) {
     if (!logs) return false;
     const relationships = normalizeOperatorRelationships(own(save, "operatorRelationships"));
     for (const record of chapter.archive) {
-      if (baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt)
+      if (record.playerCallsign !== own(save,"callsign") || baseline.has(record.runId) || Date.parse(record.completedAt) < Date.parse(acceptedAt)
         || !chapter.settledRunIds.includes(record.runId)) continue;
       const summary = chapter.completedRuns.find(({ runId }) => runId === record.runId);
       const proof = chapter.settlementProofs.find(({ runId }) => runId === record.runId);
@@ -72,10 +73,10 @@ export function verifiedStormRelayCompletion(save, active) {
       const relayLog = logs.find((entry) => own(entry, "id") === relayId);
       if (!verifiedLog(controlLog, {
         id: controlId, runId: record.runId, callsign: "SIM12CS", npcId: "chapter12-control",
-        personId: record.controlPersonId, stationId: record.controlStationId, completedAt: record.completedAt,
+        personId: record.controlPersonId, stationId: record.controlStationId, playerCallsign: record.playerCallsign, completedAt: record.completedAt,
       }) || !verifiedLog(relayLog, {
         id: relayId, runId: record.runId, callsign: "SIM12RL", npcId: "chapter12-relay",
-        personId: record.relayPersonId, stationId: record.relayStationId, completedAt: record.completedAt,
+        personId: record.relayPersonId, stationId: record.relayStationId, playerCallsign: record.playerCallsign, completedAt: record.completedAt,
       })) continue;
       const completedAt = Date.parse(record.completedAt);
       const relationshipValid = [record.controlPersonId, record.relayPersonId].every((personId) => {

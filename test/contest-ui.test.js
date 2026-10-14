@@ -16,7 +16,7 @@ test("Chapter 10 screen exposes RUN, S&P, real keying, scoring, penalties, and n
   assert.match(screen, /data-contest-contact-count=\{run\.contacts\.length\}/);
   assert.match(screen, /data-contest-score=\{score\.score\}/);
   assert.match(screen, /data-contest-wpm=\{save\.automaticKeyWpm\}/);
-  assert.match(screen, /data-contest-paused=\{inputBlocked \|\| !windowActive\}/);
+  assert.match(screen, /data-contest-paused=\{inputBlocked \|\| leaveOpen \|\| !windowActive\}/);
   assert.match(screen, /data-contest-keying=\{cw\.isKeying\}/);
   assert.match(screen, /data-action="contest-mode-run"/);
   assert.match(screen, /data-action="contest-mode-sp"/);
@@ -29,7 +29,7 @@ test("Chapter 10 screen exposes RUN, S&P, real keying, scoring, penalties, and n
   assert.match(screen, /data-action="contest-finish"/);
   assert.match(screen, /data-action="contest-settle"/);
   assert.match(screen, /data-settlement-attempts=\{settlementAttempts\}/);
-  assert.match(screen, /data-action="contest-settle" disabled=\{inputBlocked\}/);
+  assert.match(screen, /data-action="contest-settle" disabled=\{controlsBlocked \|\| settled\}/);
   assert.match(screen, /settled && <p className="contest-settlement-banner" role="status">\{settledText\}/);
   assert.equal(Object.keys(CONTEST_SETTLED_TEXT).length, 7);
   assert.match(screen, /useCwCore/);
@@ -59,7 +59,7 @@ test("Chapter 10 route, mission, replay, leave guard, and responsive contracts s
   assert.match(app, /screen === "contest"/);
   assert.match(home, /contestReplayAvailable\(save\)/);
   assert.match(home, /data-action="enter-contest-home"/);
-  assert.match(mission, /mission\.id === "story-10" && \(active \|\| contestReplay\)/);
+  assert.match(mission, /mission\.id === "story-10" && \(\(active && !onLaunchChapterTen\) \|\| contestReplay\)/);
   assert.match(mission, /data-action="launch-contest"/);
   assert.match(css, /@media \(max-width: 820px\)[\s\S]*\.contest-screen/);
   assert.equal(contestLeaveRisk({ phase: CONTEST_PHASES.RUN_PILEUP }, false), "active");

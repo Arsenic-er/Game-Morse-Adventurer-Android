@@ -1,3 +1,21 @@
+import {chapterFifteenStoryText} from "./chapterFifteenStoryText.js";
+import {chapterFifteenStoryModel} from "../game/chapterFifteenStory.js";
+import {chapterFourteenStoryText} from "./chapterFourteenStoryText.js";
+import {chapterFourteenStoryModel} from "../game/chapterFourteenStory.js";
+import {chapterThirteenStoryText} from "./chapterThirteenStoryText.js";
+import {chapterThirteenStoryModel} from "../game/chapterThirteenStory.js";
+import {chapterElevenStoryText} from "./chapterElevenStoryText.js";
+import {chapterTwelveStoryText} from "./chapterTwelveStoryText.js";
+import {chapterElevenStoryModel} from "../game/chapterElevenStory.js";
+import {chapterTwelveStoryModel} from "../game/chapterTwelveStory.js";
+import {chapterTenStoryText} from "./chapterTenStoryText.js";
+import {chapterTenStoryModel} from "../game/chapterTenStory.js";
+import { chapterNineStoryText } from "./chapterNineStoryText.js";
+import { chapterNineStoryModel } from "../game/chapterNineStory.js";
+import { chapterEightStoryText } from "./chapterEightStoryText.js";
+import { chapterEightStoryModel } from "../game/chapterEightStory.js";
+import { chapterSevenStoryText } from "./chapterSevenStoryText.js";
+import { chapterSevenStoryModel } from "../game/chapterSevenStory.js";
 import { chapterSixStoryText } from "./chapterSixStoryText.js";
 import { chapterFiveStoryText } from "./chapterFiveStoryText.js";
 import { useEffect, useState } from "react";
@@ -545,7 +563,7 @@ function WarehouseModal({ language, save, onEquipItem, onUnlockTechnology, onClo
   );
 }
 
-export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTechnology, onAcceptMission, onClaimMission, onAbandonMission, onEnterChapterOne, onEnterChapterTwo, onEnterChapterThree, onEnterChapterFour, onEnterChapterFive, onEnterChapterSix, onEnterLights, onEnterExpedition, onEnterQslStory, onEnterServiceNet, onEnterCoordinateRelay, onEnterContest, onEnterListening, onEnterStormRelay, onEnterNightOperations, onEnterFinalPromise, onSettleFirstPage, onUpdateOpenStationGoal, onConfirmQslChoice, onEnterStation, onEnterPractice, onBack, onSettings }) {
+export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTechnology, onAcceptMission, onClaimMission, onAbandonMission, onEnterChapterOne, onEnterChapterTwo, onEnterChapterThree, onEnterChapterFour, onEnterChapterFive, onEnterChapterSix, onEnterChapterSeven, onEnterChapterEight, onEnterChapterNine, onEnterChapterTen, onEnterChapterEleven, onEnterChapterTwelve, onEnterChapterThirteen, onEnterChapterFourteen, onEnterChapterFifteen, onEnterLights, onEnterExpedition, onEnterQslStory, onEnterServiceNet, onEnterCoordinateRelay, onEnterContest, onEnterListening, onEnterStormRelay, onEnterNightOperations, onEnterFinalPromise, onSettleFirstPage, onUpdateOpenStationGoal, onConfirmQslChoice, onEnterStation, onEnterPractice, onBack, onSettings }) {
   const t = TEXT[language] ?? TEXT.en;
   const openStationText = OPEN_STATION_TEXT[language] ?? OPEN_STATION_TEXT.en;
   const location = getLocation(save.locationId);
@@ -620,23 +638,34 @@ export function HomeScreen({ language, save, onPurchase, onEquipItem, onUnlockTe
       {onEnterChapterOne && !save.missionState?.claimedMissionIds?.includes("story-01") && <button className="home-chapter-one-button" data-action="enter-chapter-one-home" onClick={onEnterChapterOne}><BookOpenText size={20} />{chapterOneStoryLabels(language).entry}</button>}
       <button className="home-people-qsl-button" data-action="open-people-qsl" aria-label={t.peopleQsl} onClick={() => setPanel("people-qsl")}><Users size={20} weight="fill" />{t.peopleQsl}</button>
       {expeditionReplay && <button className="home-expedition-button" data-action="enter-expedition-home" aria-label={t.expedition} onClick={onEnterExpedition}><Broadcast size={20} weight="fill" />{t.expedition}</button>}
+      {onEnterChapterSeven && ["available","active","ready"].includes(chapterSevenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-seven-home" onClick={onEnterChapterSeven}><BookOpenText size={20} />{chapterSevenStoryText(language).entry}</button>}
+      {onEnterChapterEight && ["available","active","ready"].includes(chapterEightStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-eight-home" onClick={onEnterChapterEight}><BookOpenText size={20} />{chapterEightStoryText(language).entry}</button>}
+      {onEnterChapterNine && ["available","active","ready"].includes(chapterNineStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-nine-home" onClick={onEnterChapterNine}><BookOpenText size={20} />{chapterNineStoryText(language).entry}</button>}
+      {onEnterChapterTen && ["available","active","ready"].includes(chapterTenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-ten-home" onClick={onEnterChapterTen}><BookOpenText size={20} />{chapterTenStoryText(language).entry}</button>}
+      {onEnterChapterEleven && ["available","active","ready"].includes(chapterElevenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-eleven-home" onClick={onEnterChapterEleven}><BookOpenText size={20} />{chapterElevenStoryText(language).entry}</button>}
+      {onEnterChapterTwelve && ["available","active","ready"].includes(chapterTwelveStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-twelve-home" onClick={onEnterChapterTwelve}><BookOpenText size={20} />{chapterTwelveStoryText(language).entry}</button>}
+      {onEnterChapterThirteen && ["available","active","ready"].includes(chapterThirteenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-thirteen-home" onClick={onEnterChapterThirteen}><BookOpenText size={20} />{chapterThirteenStoryText(language).entry}</button>}
+      {onEnterChapterFifteen && ["available","active","ready"].includes(chapterFifteenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-fifteen-home" onClick={onEnterChapterFifteen}><BookOpenText size={20} />{chapterFifteenStoryText(language).entry}</button>}
+      {onEnterChapterFourteen && ["available","active","ready"].includes(chapterFourteenStoryModel(save).status) && <button className="home-chapter-one-button" data-action="enter-chapter-fourteen-home" onClick={onEnterChapterFourteen}><BookOpenText size={20} />{chapterFourteenStoryText(language).entry}</button>}
       {qslStoryReplay && <button className="home-qsl-story-button" data-action="enter-qsl-story-home" aria-label={t.qslStory} onClick={onEnterQslStory}><FileMagnifyingGlass size={20} weight="fill" />{t.qslStory}</button>}
       {serviceNetReplay && <button className="home-service-net-button" data-action="enter-service-net-home" aria-label={t.serviceNet} onClick={onEnterServiceNet}><Broadcast size={20} weight="fill" />{t.serviceNet}</button>}
       {coordinateRelayReplay && <button className="home-coordinate-relay-button" data-action="enter-coordinate-relay-home" aria-label={t.coordinateRelay} onClick={onEnterCoordinateRelay}><GridFour size={20} weight="fill" />{t.coordinateRelay}</button>}
-      {contestReplay && <button className="home-contest-button" data-action="enter-contest-home" aria-label={t.contest} onClick={onEnterContest}><Trophy size={20} weight="fill" />{t.contest}</button>}
-      {listeningReplay && <button className="home-listening-button" data-action="enter-listening-home" aria-label={t.listening} onClick={onEnterListening}><Broadcast size={20} weight="fill" />{t.listening}</button>}
-      {stormRelayReplay && <button className="home-storm-relay-button" data-action="enter-storm-relay-home" aria-label={stormText.title} onClick={onEnterStormRelay}><Broadcast size={20} weight="fill" />{stormText.title}</button>}
-      {nightReplay && <button className="home-night-operations-button" data-action="enter-night-operations-home" aria-label={nightText.title} onClick={onEnterNightOperations}><Broadcast size={20} weight="fill" />{nightText.title}</button>}
+      {(contestReplay || listeningReplay || stormRelayReplay || nightReplay || finalPromiseReplay) && <div className="home-contest-listening-actions">
       {finalPromiseReplay && <button className="home-final-promise-button" data-action="enter-final-promise-home" aria-label={finalPromiseText.title} onClick={onEnterFinalPromise}><BookOpenText size={20} weight="fill" />{finalPromiseText.title}</button>}
-      {pendingFirstPage && <button className="home-first-page-button" data-action="open-first-page" aria-label="First page" onClick={() => setPanel("first-page")}><BookOpenText size={20} weight="fill" />{pendingFirstPage.callsign}</button>}
-      {openStationUnlocked && <button className="home-open-station-button" data-action="open-open-station" aria-label={openStationText.title} onClick={() => setPanel("open-station")}><Radio size={20} weight="fill" />{openStationText.title}</button>}
+      {nightReplay && <button className="home-night-operations-button" data-action="enter-night-operations-home" aria-label={nightText.title} onClick={onEnterNightOperations}><Broadcast size={20} weight="fill" />{nightText.title}</button>}
+      {stormRelayReplay && <button className="home-storm-relay-button" data-action="enter-storm-relay-home" aria-label={stormText.title} onClick={onEnterStormRelay}><Broadcast size={20} weight="fill" />{stormText.title}</button>}
+      {listeningReplay && <button className="home-listening-button" data-action="enter-listening-home" aria-label={t.listening} onClick={onEnterListening}><Broadcast size={20} weight="fill" />{t.listening}</button>}
+      {contestReplay && <button className="home-contest-button" data-action="enter-contest-home" aria-label={t.contest} onClick={onEnterContest}><Trophy size={20} weight="fill" />{t.contest}</button>}
+      </div>}
+      {pendingFirstPage && !onEnterChapterFifteen && <button className="home-first-page-button" data-action="open-first-page" aria-label="First page" onClick={() => setPanel("first-page")}><BookOpenText size={20} weight="fill" />{pendingFirstPage.callsign}</button>}
+      {openStationUnlocked && <button className="home-chapter-one-button home-open-station-button" data-action="open-open-station" aria-label={openStationText.title} onClick={() => setPanel("open-station")}><Radio size={20} weight="fill" />{openStationText.title}</button>}
       {nightState.taskTreeUnlocked && <button className="home-station-operations-button" data-action="open-station-operations" aria-label={nightText.board} onClick={() => setPanel("station-operations")}><ClipboardText size={20} weight="fill" />{nightText.board}</button>}
       {coordinateState.toolUnlocked && <button className="home-structured-message-button" data-action="open-structured-messages" aria-label={t.structuredMessages} onClick={() => setPanel("structured-messages")}><ClipboardText size={20} weight="fill" />{t.structuredMessages}</button>}
       {panel === "warehouse" && <WarehouseModal language={language} save={save} onEquipItem={onEquipItem} onUnlockTechnology={onUnlockTechnology} onClose={() => setPanel(null)} />}
       {panel === "store" && <StoreModal language={language} save={save} onPurchase={onPurchase} onClose={() => setPanel(null)} />}
       {panel === "log" && <QsoLogModal language={language} save={save} onClose={() => setPanel(null)} />}
       {panel === "achievements" && <AchievementsModal language={language} save={save} onClose={() => setPanel(null)} />}
-      {panel === "missions" && <MissionCenterModal language={language} save={save} onAccept={onAcceptMission} onClaim={onClaimMission} onAbandon={onAbandonMission} onLaunchChapterOne={onEnterChapterOne} onLaunchChapterTwo={onEnterChapterTwo} onLaunchChapterThree={onEnterChapterThree} onLaunchChapterFour={onEnterChapterFour} onLaunchChapterFive={onEnterChapterFive} onLaunchChapterSix={onEnterChapterSix} onLaunchLights={onEnterLights} onLaunchExpedition={onEnterExpedition} onLaunchQslStory={onEnterQslStory} onLaunchServiceNet={onEnterServiceNet} onLaunchCoordinateRelay={onEnterCoordinateRelay} onLaunchContest={onEnterContest} onLaunchListening={onEnterListening} onLaunchStormRelay={onEnterStormRelay} onLaunchNightOperations={onEnterNightOperations} onLaunchFinalPromise={onEnterFinalPromise} onLaunchFirstPageQso={onEnterStation} onOpenStation={() => setPanel("open-station")} onClose={() => setPanel(null)} />}
+      {panel === "missions" && <MissionCenterModal language={language} save={save} onAccept={onAcceptMission} onClaim={onClaimMission} onAbandon={onAbandonMission} onLaunchChapterOne={onEnterChapterOne} onLaunchChapterTwo={onEnterChapterTwo} onLaunchChapterThree={onEnterChapterThree} onLaunchChapterFour={onEnterChapterFour} onLaunchChapterFive={onEnterChapterFive} onLaunchChapterSix={onEnterChapterSix} onLaunchChapterSeven={onEnterChapterSeven} onLaunchChapterEight={onEnterChapterEight} onLaunchChapterNine={onEnterChapterNine} onLaunchChapterTen={onEnterChapterTen} onLaunchChapterEleven={onEnterChapterEleven} onLaunchChapterTwelve={onEnterChapterTwelve} onLaunchChapterThirteen={onEnterChapterThirteen} onLaunchChapterFourteen={onEnterChapterFourteen} onLaunchChapterFifteen={onEnterChapterFifteen} onLaunchLights={onEnterLights} onLaunchExpedition={onEnterExpedition} onLaunchQslStory={onEnterQslStory} onLaunchServiceNet={onEnterServiceNet} onLaunchCoordinateRelay={onEnterCoordinateRelay} onLaunchContest={onEnterContest} onLaunchListening={onEnterListening} onLaunchStormRelay={onEnterStormRelay} onLaunchNightOperations={onEnterNightOperations} onLaunchFinalPromise={onEnterFinalPromise} onLaunchFirstPageQso={onEnterStation} onOpenStation={() => setPanel("open-station")} onClose={() => setPanel(null)} />}
       {panel === "first-page" && <FirstPageModal language={language} save={save} onSettle={onSettleFirstPage} onClose={() => setPanel(null)} />}
       {panel === "open-station" && <OpenStationModal language={language} save={save} onUpdateGoal={onUpdateOpenStationGoal} onClose={() => setPanel(null)} />}
       {panel === "people-qsl" && <PeopleAndQslModal language={language} save={save} onConfirmChoice={onConfirmQslChoice} onClose={() => setPanel(null)} />}

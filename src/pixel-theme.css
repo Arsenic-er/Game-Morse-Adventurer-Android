@@ -1950,7 +1950,7 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
 }
 
 /* Chapter 11: fictional listening record */
-.home-listening-button { position: absolute; right: 18px; bottom: 316px; z-index: 4; display: flex; align-items: center; gap: 7px; }
+.home-listening-button { position: absolute; right: 18px; bottom: 356px; z-index: 4; display: flex; align-items: center; gap: 7px; }
 .listening-screen { min-height: 100vh; overflow: auto; color: #e9f7f3; background: radial-gradient(circle at 50% 10%, #173a3b 0, #08191c 46%, #03090b 100%); }
 .listening-topbar { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 18px; min-height: 72px; padding: 10px 20px; border-bottom: 4px solid #377e78; background: #071619e8; }.listening-topbar > div { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; }.listening-topbar svg { grid-row: span 2; color: #7de0cf; }.listening-topbar span { color: #75aaa4; font-size: 11px; letter-spacing: 1px; }.listening-topbar h1 { margin: 0; color: #d8fff7; font-size: 21px; }.listening-topbar > b { color: #ffe19a; }
 .listening-simulation { display: flex; align-items: center; justify-content: center; gap: 9px; width: min(1040px, calc(100% - 30px)); margin: 18px auto 0; padding: 9px 14px; border: 3px solid #a28743; color: #ffefc1; background: #30260d; }.listening-paused { position: fixed; z-index: 6; top: 78px; left: 50%; translate: -50%; padding: 8px 15px; border: 3px solid #d4aa52; background: #34270d; color: #fff0bc; }
@@ -2073,6 +2073,13 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .qsl-card-list article > div { grid-template-columns: 1fr; }
   .home-expedition-button, .home-people-qsl-button, .home-qsl-story-button, .home-service-net-button, .home-coordinate-relay-button, .home-structured-message-button { right: 12px; max-width: calc(100% - 24px); }
   .qsl-story-screen { min-width: 0; }
+  .qsl-story-topbar { flex-wrap: wrap; gap: 10px; }
+  .qsl-story-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .qsl-story-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .qsl-story-console { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .qsl-story-console > * { min-width: 0; }
+  .qsl-story-message > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .qsl-story-accounts p, .qsl-story-message code { overflow-wrap: anywhere; }
   .qsl-story-accounts { grid-template-columns: 1fr; }
   .qsl-story-choices { grid-template-columns: 1fr; }
   .service-net-screen { min-width: 0; }
@@ -2245,3 +2252,91 @@ button:focus-visible { outline: 3px solid #e7d682; outline-offset: 2px; }
   .open-station-lines article:last-child { grid-column: 1; }
   .open-station-recent article { grid-template-columns: 1fr; }
 }
+
+/* Chapter Eight: keep localized controls inside narrow activity panels. */
+@media (max-width: 820px) {
+  .service-net-screen { min-width: 0; }
+  .service-net-topbar { flex-wrap: wrap; gap: 10px; }
+  .service-net-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .service-net-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .service-net-layout { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .service-net-layout > * { min-width: 0; }
+  .service-net-meter { flex-wrap: wrap; }
+  .service-net-message > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .service-net-current code, .service-net-message code { overflow-wrap: anywhere; }
+}
+
+/* Keep Chapter Nine localized labels and long packet fields within the viewport. */
+@media (max-width: 820px) {
+  .coordinate-relay-screen { min-width: 0; }
+  .coordinate-relay-topbar { flex-wrap: wrap; gap: 10px; }
+  .coordinate-relay-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .coordinate-relay-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .coordinate-relay-layout { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .coordinate-relay-layout > * { min-width: 0; }
+  .coordinate-relay-meter { flex-wrap: wrap; }
+  .coordinate-relay-input > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .coordinate-relay-packet code, .coordinate-relay-input code, .coordinate-relay-confirm code { overflow-wrap: anywhere; }
+}
+
+/* Chapter Ten: long localized controls and exchanges stay within narrow viewports. */
+@media (max-width: 820px) {
+  .contest-screen, .contest-layout > * { min-width: 0; }
+  .contest-topbar { flex-wrap: wrap; gap: 10px; }
+  .contest-topbar > div { min-width: 0; flex: 1 1 160px; }
+  .contest-screen button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .contest-layout { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+  .contest-exchange code, .contest-run-cq code, .contest-keyer strong { overflow-wrap: anywhere; }
+  .contest-keyer > div, .contest-mode-select > div, .contest-briefing > div { display: flex; flex-wrap: wrap; gap: 8px; }
+}
+
+/* Chapter eleven: localized labels and long station IDs must wrap at narrow widths. */
+.listening-topbar { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.listening-topbar > div, .listening-layout > *, .listening-console section, .listening-windows article { min-width: 0; }
+.listening-topbar h1, .listening-screen button, .listening-windows article, .listening-keyer > strong { overflow-wrap: anywhere; }
+.listening-screen button { white-space: normal; max-width: 100%; }
+@media (max-width: 820px) {
+  .listening-topbar { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 12px; }
+  .listening-topbar > button { justify-self: start; }
+  .listening-console { padding: 12px; }
+}
+
+/* Replay labels can wrap: position the entries as a group, never with fixed per-button offsets. */
+.home-contest-listening-actions { position: absolute; z-index: 5; right: 22px; bottom: 308px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: calc(100% - 44px); }
+.home-contest-listening-actions > button { position: static; max-width: 100%; }
+@media (max-width: 820px) { .home-contest-listening-actions { right: 12px; max-width: calc(100% - 24px); } }
+
+/* Chapter twelve: wrap packet fields and translated controls at mobile widths. */
+.home-storm-relay-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #d49b45; background: #101a29ee; color: #ffe4a8; white-space: normal; overflow-wrap: anywhere; }
+.storm-relay-topbar > div, .storm-relay-layout > *, .storm-packet-board, .storm-packet-board article, .storm-relay-keyer { min-width: 0; }
+.storm-relay-screen button, .storm-relay-topbar h1 { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+@media (max-width: 820px) {
+  .storm-relay-layout { grid-template-columns: minmax(0, 1fr); }
+  .storm-relay-topbar > div { flex: 1 1 180px; }
+  .storm-relay-stations { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .storm-relay-stations article { min-width: 0; overflow-wrap: anywhere; }
+}
+
+.storm-relay-layout { overflow-wrap: anywhere; }
+
+/* Chapter thirteen: scheduled contacts and localized controls must fit narrow screens. */
+.home-night-operations-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #90b9ff; background: #12192bee; color: #d8e6ff; white-space: normal; overflow-wrap: anywhere; }
+.night-operations-layout, .night-operations-keyer code, .night-operations-keyer > strong { overflow-wrap: anywhere; }
+.night-operations-topbar > div, .night-operations-layout > *, .night-window-grid article { min-width: 0; }
+.night-operations-screen button, .night-operations-topbar h1 { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.night-operations-topbar, .night-operations-topbar > div, .night-operations-keyer > div { flex-wrap: wrap; }
+@media (max-width: 820px) {
+  .night-operations-topbar > div { flex: 1 1 180px; }
+  .night-operations-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Chapter fourteen: narrow keyer, long record IDs and replay menu. */
+.final-promise-topbar, .final-promise-topbar > div, .final-promise-action > div, .final-promise-keyer > div { flex-wrap: wrap; min-width: 0; }
+.final-promise-screen :is(h1,h2,p,code,dd,li,button,strong) { overflow-wrap: anywhere; }
+.final-promise-topbar > div { flex: 1 1 380px; }
+.final-promise-topbar > div h1 { flex-basis: 100%; }
+.final-promise-screen button { max-width: 100%; white-space: normal; }
+.final-promise-page dl { grid-template-columns: minmax(0,1fr) minmax(0,2fr); }
+.final-promise-result button + button { margin: 8px; }
+.chapter-fourteen-story-screen .chapter-one-logbook { overflow-wrap: anywhere; }
+.home-final-promise-button { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border: 3px solid #d7b968; background: #1b1923; color: #ffe4a0; box-shadow: 4px 4px 0 #000; font-weight: 900; }

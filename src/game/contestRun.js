@@ -328,11 +328,13 @@ export function submitContestText(value, decodedValue, semanticResult, observedA
   });
   const contacts = [...run.contacts, contact];
   const reachedCap = contacts.length >= CONTEST_CONTACT_LIMIT;
+  const capComplete = reachedCap && eligible({...run,contacts});
   return transition(run, {
     contacts,
     nextSerial: run.nextSerial + 1,
     cleanExchanges: run.cleanExchanges + (run.currentExchangeRecovered || run.errors.length > 0 ? 0 : 1),
-    phase: reachedCap ? CONTEST_PHASES.COMPLETED : CONTEST_PHASES.MODE_SELECT,
+    phase: reachedCap ? (capComplete ? CONTEST_PHASES.COMPLETED : CONTEST_PHASES.FAILED) : CONTEST_PHASES.MODE_SELECT,
+    failureReason: reachedCap && !capComplete ? "MINIMUM_NOT_MET" : null,
     completedAt: reachedCap ? at : null,
     mode: null,
     candidates: [],
@@ -498,6 +500,13 @@ function normalizeContestRecord(value) {
       return personIdForOperator(identity) === proof.personId && stationIdentityForCallsign(proof.callsign, identity)?.stationId === proof.stationId ? deepFreeze(proof) : null;
     });
     if (contacts.some((contact) => !contact) || new Set(contacts.map(({ personId }) => personId)).size !== contacts.length) return null;
+    const runCount=contacts.filter(({mode})=>mode==="RUN").length,spCount=contacts.filter(({mode})=>mode==="SP").length;
+    if(result.runContacts!==runCount || result.spContacts!==spCount || result.uniqueRegions!==new Set(contacts.map(({regionCode})=>regionCode)).size
+      || contacts.some((contact,index)=>Date.parse(contact.completedAt)>Date.parse(result.completedAt) || (index>0 && Date.parse(contact.completedAt)<Date.parse(contacts[index-1].completedAt))))return null;
+    const base=result.validContacts*100+result.uniqueRegions*40+150-Math.min(result.repeatRequests*10,60)-Math.min(result.bustedCalls*40,160)-Math.min(result.interruptions*30,120);
+    const cleanBonus=result.score-base;
+    const grade=result.score>=1100 && result.bustedCalls===0 && result.interruptions===0 ? "gold" : result.score>=900 ? "silver" : "complete";
+    if(cleanBonus<0 || cleanBonus>120 || cleanBonus%20!==0 || result.grade!==grade)return null;
     return deepFreeze({ ...result, contactQsoIds: deepFreeze(result.contactQsoIds), contacts: deepFreeze(contacts) });
   } catch { return null; }
 }

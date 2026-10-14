@@ -56,7 +56,7 @@ test("chapter seven exposes its accepted investigation action with localized sto
 });
 
 test("chapter eight exposes its accepted service-net action and durable replay with localized story copy", () => {
-  assert.match(source, /mission\.id === "story-08" && \(active \|\| serviceNetReplay\)/);
+  assert.match(source, /mission\.id === "story-08" && \(\(active && !onLaunchChapterEight\) \|\| serviceNetReplay\)/);
   assert.match(source, /data-action="launch-service-net"/);
   for (const key of ["story08Title", "story08Description", "story08Objective", "story08Brief", "story08Debrief", "launchServiceNet"]) {
     assert.equal((source.match(new RegExp(`${key}:`, "g")) ?? []).length, 7, `${key} must exist in seven languages`);
@@ -64,7 +64,7 @@ test("chapter eight exposes its accepted service-net action and durable replay w
 });
 
 test("chapter nine exposes its accepted coordinate-relay action and durable replay with localized story copy", () => {
-  assert.match(source, /mission\.id === "story-09" && \(active \|\| coordinateRelayReplay\)/);
+  assert.match(source, /mission\.id === "story-09" && \(\(active && !onLaunchChapterNine\) \|\| coordinateRelayReplay\)/);
   assert.match(source, /data-action="launch-coordinate-relay"/);
   for (const key of ["story09Title", "story09Description", "story09Objective", "story09Brief", "story09Debrief", "launchCoordinateRelay"]) {
     assert.equal((source.match(new RegExp(`${key}:`, "g")) ?? []).length, 7, `${key} must exist in seven languages`);
@@ -72,7 +72,7 @@ test("chapter nine exposes its accepted coordinate-relay action and durable repl
 });
 
 test("chapter ten exposes its accepted contest action and durable replay with localized story copy", () => {
-  assert.match(source, /mission\.id === "story-10" && \(active \|\| contestReplay\)/);
+  assert.match(source, /mission\.id === "story-10" && \(\(active && !onLaunchChapterTen\) \|\| contestReplay\)/);
   assert.match(source, /data-action="launch-contest"/);
   for (const key of ["story10Title", "story10Description", "story10Objective", "story10Brief", "story10Debrief", "launchContest"]) {
     assert.equal((source.match(new RegExp(`${key}:`, "g")) ?? []).length, 7, `${key} must exist in seven languages`);
